@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 import { nanoid } from "nanoid";
+import { useQuery } from "@tanstack/react-query";
 
 // "undefined" means the URL will be computed from the `window.location` object
 const URL =
@@ -41,28 +42,28 @@ const Lobby = ({ onStartGame }: { onStartGame: () => void }) => {
 };
 
 const Game = ({ id }: { id: number }) => {
-  const [details, setDetails] = useState<AnimeDetails>();
+  const { error, data: res } = useQuery({
+    queryKey: ["animeDetails"],
+    queryFn: async () => {
+      const response = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
+      return await response.json();
+    },
+  });
 
-  useEffect(() => {
-    const getDetails = async () => {
-      const rawResponse = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
+  if (error) return <>An error has occurred: + {error}</>;
 
-      const res = await rawResponse.json();
+  if (!res) return <>Loading...</>;
 
-      const result = {
-        id,
-        title: res.data?.title,
-        title_english: res.data?.title_english,
-        imageUrl: res.data?.images?.webp?.image_url,
-      };
+  const details = {
+    id,
+    title: res?.data?.title,
+    title_english: res?.data?.title_english,
+    imageUrl: res?.data?.images?.webp?.image_url,
+  };
 
-      setDetails(result);
-    };
+  console.log(details);
 
-    getDetails();
-  }, [id]);
-
-  return details ? <AnimeCard details={details} /> : null;
+  return <AnimeCard details={details} />;
 };
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };

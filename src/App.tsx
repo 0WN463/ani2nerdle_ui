@@ -1,6 +1,9 @@
 import "./App.css";
 import { Link, Routes, Route, useNavigate } from "react-router-dom";
 import Lobby from "./lobby/Lobby";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const URL =
   process.env.NODE_ENV === "production" ? undefined : "http://localhost:3000";
@@ -27,10 +30,12 @@ function App() {
   );
 
   return (
-    <Routes>
-      <Route path="/" element={home} />
-      <Route path="/game/:id" element={<Lobby />} />
-    </Routes>
+    <QueryClientProvider client={queryClient}>
+      <Routes>
+        <Route path="/" element={home} />
+        <Route path="/game/:id" element={<Lobby />} />
+      </Routes>
+    </QueryClientProvider>
   );
 }
 
