@@ -1,12 +1,9 @@
 import "./App.css";
-import { io } from "socket.io-client";
 import { Link, Routes, Route, useNavigate } from "react-router-dom";
+import Lobby from "./lobby/Lobby";
 
-// "undefined" means the URL will be computed from the `window.location` object
 const URL =
   process.env.NODE_ENV === "production" ? undefined : "http://localhost:3000";
-console.log(URL);
-export const socket = io(URL);
 
 function App() {
   const navigate = useNavigate();
@@ -29,12 +26,10 @@ function App() {
     </div>
   );
 
-  const game = <div> game </div>;
-
   return (
     <Routes>
       <Route path="/" element={home} />
-      <Route path="/game/:id" element={game} />
+      <Route path="/game/:id" element={<Lobby />} />
     </Routes>
   );
 }
