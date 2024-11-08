@@ -8,34 +8,34 @@ import Select from "react-select";
 
 // Adapted from https://raw.githubusercontent.com/uidotdev/usehooks/refs/heads/main/index.js
 const useDebounce = <T,>(value: T, delay: number) => {
+  const [state, setState] = useState<T>(value);
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedValue(value);
+      setDebouncedValue(state);
     }, delay);
 
     return () => {
       clearTimeout(handler);
     };
-  }, [value, delay]);
+  }, [state, delay]);
 
-  return debouncedValue;
+  return [debouncedValue, setState] as const;
 };
 
 const SearchBar = () => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [searchTerm, setSearchTerm] = useDebounce("", 300);
 
   const { error, data: res } = useQuery({
-    queryKey: ["searchAnime", debouncedSearchTerm],
+    queryKey: ["searchAnime", searchTerm],
     queryFn: async () => {
       const response = await fetch(
-        `https://api.jikan.moe/v4/anime?q=${debouncedSearchTerm}&sfw=true`,
+        `https://api.jikan.moe/v4/anime?q=${searchTerm}&sfw=true`,
       );
       return await response.json();
     },
-    enabled: debouncedSearchTerm !== "",
+    enabled: searchTerm !== "",
   });
 
   const formatLabel = (a: any) => (
