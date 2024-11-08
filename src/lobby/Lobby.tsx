@@ -24,7 +24,7 @@ const useDebounce = <T,>(value: T, delay: number) => {
   return [debouncedValue, setState] as const;
 };
 
-const SearchBar = () => {
+const SearchBar = ({ onSelect }: { onSelect: (id: number) => void }) => {
   const [searchTerm, setSearchTerm] = useDebounce("", 300);
 
   const { error, data: res } = useQuery({
@@ -63,7 +63,7 @@ const SearchBar = () => {
       <Select
         onInputChange={setSearchTerm}
         options={options}
-        onChange={console.log}
+        onChange={(e: any) => onSelect(e.value)}
         filterOption={() => true}
       />
     </>
@@ -122,49 +122,41 @@ type Linkage = {
   chara_img_url?: string;
 };
 
-const useLinkages = (animeId: number) => {
-  const { error, data: res } = useQuery({
+const useLinkages = (animeId?: number) => {
+  return useQuery({
+    enabled: !!animeId,
     queryKey: ["animeLinkages", animeId],
     queryFn: async () => {
       const response = await fetch(
         `https://api.jikan.moe/v4/anime/${animeId}/characters`,
       );
-      return await response.json();
+      const res = await response.json();
+
+      const charaToLinkage = (data: any) => {
+        const japVa = data.voice_actors.find(
+          (role: any) => role.language === "Japanese",
+        );
+
+        if (!japVa) return null;
+
+        return {
+          name: japVa.person.name,
+          id: japVa.person.mal_id,
+          chara_name: data.character.name,
+          chara_img_url: data.character.images.webp.image_url,
+        };
+      };
+
+      return res?.data?.map(charaToLinkage).filter((l?: Linkage) => l);
     },
   });
-
-  if (error) return { linkages: null, error };
-
-  const charaToLinkage = (data: any) => {
-    const japVa = data.voice_actors.find(
-      (role: any) => role.language === "Japanese",
-    );
-
-    if (!japVa) return null;
-
-    return {
-      name: japVa.person.name,
-      id: japVa.person.mal_id,
-      chara_name: data.character.name,
-      chara_img_url: data.character.images.webp.image_url,
-    };
-  };
-
-  return {
-    linkages: res?.data
-      ?.map(charaToLinkage)
-      .filter((l?: Linkage) => l !== undefined),
-    error,
-  };
 };
 
 const useGameState = (id: number) => {
   const [state, setState] = useState<GameState>();
-  const { linkages } = useLinkages(id);
+  const { data: linkages } = useLinkages(id);
 
-  console.log(linkages);
-
-  return [state];
+  return { state, linkages };
 };
 
 const useAnimeDetails = (id: number) => {
@@ -189,14 +181,39 @@ const useAnimeDetails = (id: number) => {
 };
 
 const Game = ({ id }: { id: number }) => {
-  const [gameState] = useGameState(id);
+  const [selectedAnime, setSelectedAnime] = useState<number>();
+  const { linkages } = useGameState(id);
   const { error, details } = useAnimeDetails(id);
+  const { isLoading, data: candidateLinkages } = useLinkages(selectedAnime);
+
+  const toIds = (arr: any[]) => arr?.map((e) => e.id);
+
+  if (!isLoading) {
+    const linkageIds = toIds(linkages);
+    const candidateIds = toIds(candidateLinkages);
+    const validLinkages = linkageIds?.filter((id) =>
+      candidateIds?.includes(id),
+    );
+
+    console.log(
+      validLinkages.map(
+        (id) =>
+          `${linkages.find((l: Linkage) => l.id === id).chara_name} <-> ${candidateLinkages.find((l: Linkage) => l.id === id).chara_name}`,
+      ),
+    );
+    socket.emit("send anime", selectedAnime);
+    setSelectedAnime(undefined);
+  }
 
   if (error) return <>An error has occurred: + {error}</>;
 
+  const onAnimeSelect = (id: number) => {
+    setSelectedAnime(id);
+  };
+
   return (
     <>
-      <SearchBar />
+      <SearchBar onSelect={onAnimeSelect} />
       {details && <AnimeCard details={details} />}
     </>
   );
@@ -215,7 +232,6 @@ const Page = () => {
   useEffect(() => {
     const onPlayerJoin = (data: any) => console.log("player joined", data);
     const onGameStart = (animeId: number) => {
-      console.log("game started", animeId);
       setStage({ type: "game", animeId });
     };
 
@@ -229,7 +245,6 @@ const Page = () => {
   });
 
   const startGame = () => {
-    console.log("start game");
     socket.emit("start game");
   };
 
