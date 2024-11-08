@@ -107,16 +107,76 @@ const Lobby = ({ onStartGame }: { onStartGame: () => void }) => {
   );
 };
 
-const Game = ({ id }: { id: number }) => {
+type Anime = {
+  id: number;
+};
+
+type GameState = {
+  animes: Anime[];
+};
+
+type Linkage = {
+  name: string;
+  id: number;
+  chara_name: string;
+  chara_img_url?: string;
+};
+
+const useLinkages = (animeId: number) => {
   const { error, data: res } = useQuery({
-    queryKey: ["animeDetails"],
+    queryKey: ["animeLinkages", animeId],
+    queryFn: async () => {
+      const response = await fetch(
+        `https://api.jikan.moe/v4/anime/${animeId}/characters`,
+      );
+      return await response.json();
+    },
+  });
+
+  if (error) return { linkages: null, error };
+
+  const charaToLinkage = (data: any) => {
+    const japVa = data.voice_actors.find(
+      (role: any) => role.language === "Japanese",
+    );
+
+    if (!japVa) return null;
+
+    return {
+      name: japVa.person.name,
+      id: japVa.person.mal_id,
+      chara_name: data.character.name,
+      chara_img_url: data.character.images.webp.image_url,
+    };
+  };
+
+  return {
+    linkages: res?.data
+      ?.map(charaToLinkage)
+      .filter((l?: Linkage) => l !== undefined),
+    error,
+  };
+};
+
+const useGameState = (id: number) => {
+  const [state, setState] = useState<GameState>();
+  const { linkages } = useLinkages(id);
+
+  console.log(linkages);
+
+  return [state];
+};
+
+const useAnimeDetails = (id: number) => {
+  const { error, data: res } = useQuery({
+    queryKey: ["animeDetails", id],
     queryFn: async () => {
       const response = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
       return await response.json();
     },
   });
 
-  if (error) return <>An error has occurred: + {error}</>;
+  if (error) return { details: null, error };
 
   const details = {
     id,
@@ -125,10 +185,19 @@ const Game = ({ id }: { id: number }) => {
     imageUrl: res?.data?.images?.webp?.image_url,
   };
 
+  return { details, error };
+};
+
+const Game = ({ id }: { id: number }) => {
+  const [gameState] = useGameState(id);
+  const { error, details } = useAnimeDetails(id);
+
+  if (error) return <>An error has occurred: + {error}</>;
+
   return (
     <>
       <SearchBar />
-      {res && <AnimeCard details={details} />}
+      {details && <AnimeCard details={details} />}
     </>
   );
 };
