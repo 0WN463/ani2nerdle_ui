@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 import { nanoid } from "nanoid";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 
 import Select from "react-select";
 
@@ -95,6 +95,34 @@ const AnimeCard = ({ id }: { id: number }) => {
   );
 };
 
+const VoiceActors = ({ links }: { links: ConcreteLink[] }) => (
+  <div style={{ display: "flex", gap: "4em" }}>
+    {links.map((l) => (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          {" "}
+          {l.link.to.map((c) => (
+            <div id={c.name}>{c.name}</div>
+          ))}{" "}
+        </div>
+        <div> {l.name} </div>
+        <div>
+          {" "}
+          {l.link.from.map((c) => (
+            <div id={c.name}>{c.name}</div>
+          ))}{" "}
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const Lobby = ({ onStartGame }: { onStartGame: () => void }) => {
   /* TODO: Add:
    * handicap
@@ -116,6 +144,7 @@ type Anime = {
 
 type GameState = {
   animes: Anime[];
+  linkages: number[];
 };
 
 type Linkage = {
@@ -125,7 +154,7 @@ type Linkage = {
   chara_img_url?: string;
 };
 
-const useLinkages = (animeId?: number) => {
+const useLinkage = (animeId?: number) => {
   return useQuery({
     enabled: !!animeId,
     queryKey: ["animeLinkages", animeId],
@@ -155,15 +184,72 @@ const useLinkages = (animeId?: number) => {
   });
 };
 
+const useLinkages = (animeIds: number[]) => {
+  return useQueries({
+    queries: animeIds.map((animeId) => ({
+      queryKey: ["animeLinkages", animeId],
+      enabled: !!animeId,
+      queryFn: async () => {
+        const response = await fetch(
+          `https://api.jikan.moe/v4/anime/${animeId}/characters`,
+        );
+        const res = await response.json();
+
+        const charaToLinkage = (data: any) => {
+          const japVa = data.voice_actors.find(
+            (role: any) => role.language === "Japanese",
+          );
+
+          if (!japVa) return null;
+
+          return {
+            name: japVa.person.name,
+            id: japVa.person.mal_id,
+            chara_name: data.character.name,
+            chara_img_url: data.character.images.webp.image_url,
+          };
+        };
+
+        return res?.data
+          ?.map(charaToLinkage)
+          .filter((l?: Linkage) => l) as Linkage[];
+      },
+    })),
+  });
+};
+
+const pairMap = <T, U>(arr: T[], func: (_a: T, _b: T) => U) =>
+  [...Array(arr.length - 1)]
+    .map((_, i) => i)
+    .map((i) => func(arr[i], arr[i + 1]));
+
 const useGameState = (id: number) => {
-  const [state, setState] = useState<GameState>({ animes: [{ id }] });
-  const { data: linkages } = useLinkages(state.animes[0].id);
+  const [state, setState] = useState<GameState>({
+    animes: [{ id }],
+    linkages: [],
+  });
+  const linkages = useLinkages(state.animes.map((a) => a.id));
+  const usedLinkages = pairMap(
+    linkages.map((l) => l.data ?? []),
+    computeLinks,
+  );
+  console.log("PAIR", usedLinkages);
 
   const addNextAnime = (id: number) => {
-    setState({ animes: [{ id }, ...state.animes] });
+    setState({ animes: [{ id }, ...state.animes], linkages: state.linkages });
   };
 
-  return { state, linkages, addNextAnime };
+  const addLinkage = (linkage: number) => {
+    setState({ animes: state.animes, linkages: [linkage, ...state.linkages] });
+  };
+
+  return {
+    state,
+    activeLinkage: linkages[0].data,
+    addNextAnime,
+    addLinkage,
+    linkages: usedLinkages,
+  };
 };
 
 const useAnimeDetails = (id: number) =>
@@ -182,10 +268,71 @@ const useAnimeDetails = (id: number) =>
     },
   });
 
+type Character = {
+  name: string;
+  image_url: string;
+};
+
+type ConcreteLink = {
+  id: number;
+  name: string;
+  link: { from: Character[]; to: Character[] };
+};
+
+const computeLinks = (to: Linkage[], from: Linkage[]) => {
+  const ids = Array.from(
+    new Set(
+      intersection(
+        from.map((l) => l.id),
+        to.map((l) => l.id),
+      ),
+    ),
+  );
+
+  const linkToChar = (l: Linkage) => ({
+    name: l.chara_name,
+    image_url: l.chara_img_url,
+  });
+
+  return ids.map(
+    (id) =>
+      ({
+        id,
+        name: (from.find((l) => l.id === id) as Linkage).name,
+        link: {
+          from: from.filter((l) => l.id === id).map(linkToChar),
+          to: to.filter((l) => l.id === id).map(linkToChar),
+        },
+      }) as ConcreteLink,
+  );
+};
+const intersection = <T,>(a: T[], b: T[]) => a?.filter((e) => b?.includes(e));
+
+const linkageIntersection = (from: Linkage[], to: Linkage[]) => {
+  const toIds = (arr: Linkage[]) => arr?.map((e) => e.id);
+
+  const linkageIds = toIds(from);
+  const candidateIds = toIds(to);
+  return linkageIds?.filter((id) => candidateIds?.includes(id));
+};
+
+const interleave = <T, U>(a: T[], b: U[]) => {
+  const result: (U | T)[] = [];
+
+  a.forEach((e, i) => {
+    result.push(e);
+
+    if (b[i] !== undefined) result.push(b[i]);
+  });
+
+  return result;
+};
+
 const Game = ({ id: firstAnime }: { id: number }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
-  const { linkages, addNextAnime, state } = useGameState(firstAnime);
-  const { data: candidateLinkages } = useLinkages(selectedAnime);
+  const { activeLinkage, addNextAnime, state, linkages } =
+    useGameState(firstAnime);
+  const { data: candidateLinkages } = useLinkage(selectedAnime);
 
   useEffect(() => {
     const onNextAnime = (id: number) => {
@@ -202,32 +349,24 @@ const Game = ({ id: firstAnime }: { id: number }) => {
   useEffect(() => {
     if (!candidateLinkages) return;
 
-    const linkageIds = toIds(linkages);
-    const candidateIds = toIds(candidateLinkages);
-    const validLinkages = linkageIds?.filter((id) =>
-      candidateIds?.includes(id),
-    );
-
-    console.log(
-      validLinkages.map(
-        (id) =>
-          `${linkages.find((l: Linkage) => l.id === id).chara_name} <-> ${candidateLinkages.find((l: Linkage) => l.id === id).chara_name}`,
-      ),
+    const validLinkages = linkageIntersection(
+      activeLinkage ?? [],
+      candidateLinkages,
     );
 
     if (validLinkages.length) socket.emit("send anime", selectedAnime);
 
     setSelectedAnime(undefined);
-  }, [selectedAnime, linkages, candidateLinkages]);
-
-  const toIds = (arr: any[]) => arr?.map((e) => e.id);
+  }, [selectedAnime, activeLinkage, candidateLinkages]);
 
   const onAnimeSelect = (id: number) => {
     setSelectedAnime(id);
   };
 
-  console.log(state);
-  console.log(linkages);
+  const data = interleave(
+    state.animes.map((a) => ({ type: "anime" as const, id: a.id })),
+    linkages.map((e) => ({ type: "links" as const, links: e })),
+  );
 
   return (
     <>
@@ -239,9 +378,13 @@ const Game = ({ id: firstAnime }: { id: number }) => {
           alignItems: "center",
         }}
       >
-        {state.animes.map((a) => (
-          <AnimeCard key={a.id} id={a.id} />
-        ))}
+        {data.map((e) =>
+          e.type === "anime" ? (
+            <AnimeCard key={e.id} id={e.id} />
+          ) : (
+            <VoiceActors links={e.links} />
+          ),
+        )}
       </div>
     </>
   );
