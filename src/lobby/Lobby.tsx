@@ -83,7 +83,10 @@ type AnimeDetails = {
   imageUrl?: string;
 };
 
-const AnimeCard = ({ details }: { details: AnimeDetails }) => {
+const AnimeCard = ({ id }: { id: number }) => {
+  const { isLoading, data: details } = useAnimeDetails(id);
+  if (isLoading || !details) return <div>Loading...</div>;
+
   return (
     <>
       <header>{details?.title}</header>
@@ -153,42 +156,52 @@ const useLinkages = (animeId?: number) => {
 };
 
 const useGameState = (id: number) => {
-  const [state, setState] = useState<GameState>();
-  const { data: linkages } = useLinkages(id);
+  const [state, setState] = useState<GameState>({ animes: [{ id }] });
+  const { data: linkages } = useLinkages(state.animes[0].id);
 
-  return { state, linkages };
+  const addNextAnime = (id: number) => {
+    setState({ animes: [{ id }, ...state.animes] });
+  };
+
+  return { state, linkages, addNextAnime };
 };
 
-const useAnimeDetails = (id: number) => {
-  const { error, data: res } = useQuery({
+const useAnimeDetails = (id: number) =>
+  useQuery({
     queryKey: ["animeDetails", id],
     queryFn: async () => {
       const response = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
-      return await response.json();
+      const res = await response.json();
+
+      return {
+        id,
+        title: res?.data?.title,
+        title_english: res?.data?.title_english,
+        imageUrl: res?.data?.images?.webp?.image_url,
+      } as AnimeDetails;
     },
   });
 
-  if (error) return { details: null, error };
-
-  const details = {
-    id,
-    title: res?.data?.title,
-    title_english: res?.data?.title_english,
-    imageUrl: res?.data?.images?.webp?.image_url,
-  };
-
-  return { details, error };
-};
-
-const Game = ({ id }: { id: number }) => {
+const Game = ({ id: firstAnime }: { id: number }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
-  const { linkages } = useGameState(id);
-  const { error, details } = useAnimeDetails(id);
-  const { isLoading, data: candidateLinkages } = useLinkages(selectedAnime);
+  const { linkages, addNextAnime, state } = useGameState(firstAnime);
+  const { data: candidateLinkages } = useLinkages(selectedAnime);
 
-  const toIds = (arr: any[]) => arr?.map((e) => e.id);
+  useEffect(() => {
+    const onNextAnime = (id: number) => {
+      addNextAnime(id);
+    };
 
-  if (!isLoading) {
+    socket.on("next anime", onNextAnime);
+
+    return () => {
+      socket.off("next anime", onNextAnime);
+    };
+  });
+
+  useEffect(() => {
+    if (!candidateLinkages) return;
+
     const linkageIds = toIds(linkages);
     const candidateIds = toIds(candidateLinkages);
     const validLinkages = linkageIds?.filter((id) =>
@@ -201,20 +214,35 @@ const Game = ({ id }: { id: number }) => {
           `${linkages.find((l: Linkage) => l.id === id).chara_name} <-> ${candidateLinkages.find((l: Linkage) => l.id === id).chara_name}`,
       ),
     );
-    socket.emit("send anime", selectedAnime);
-    setSelectedAnime(undefined);
-  }
 
-  if (error) return <>An error has occurred: + {error}</>;
+    if (validLinkages.length) socket.emit("send anime", selectedAnime);
+
+    setSelectedAnime(undefined);
+  }, [selectedAnime, linkages, candidateLinkages]);
+
+  const toIds = (arr: any[]) => arr?.map((e) => e.id);
 
   const onAnimeSelect = (id: number) => {
     setSelectedAnime(id);
   };
 
+  console.log(state);
+  console.log(linkages);
+
   return (
     <>
       <SearchBar onSelect={onAnimeSelect} />
-      {details && <AnimeCard details={details} />}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {state.animes.map((a) => (
+          <AnimeCard key={a.id} id={a.id} />
+        ))}
+      </div>
     </>
   );
 };
