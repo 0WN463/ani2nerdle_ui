@@ -5,8 +5,8 @@ import { socket } from "../lib/socket";
 import { nanoid } from "nanoid";
 import Lobby from "../lobby/Lobby";
 import Select from "react-select";
-import { VoiceActors, ConcreteLink } from "./VoiceActor";
-import AnimeCard from "./AnimeCard";
+import {  ConcreteLink } from "./VoiceActor";
+import Stack from "./Stack";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };
 
@@ -113,24 +113,11 @@ const Game = ({ id: firstAnime }: { id: number }) => {
   return (
     <>
       <SearchBar onSelect={setSelectedAnime} />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        {data.map((e) =>
-          e.type === "anime" ? (
-            <AnimeCard key={e.id} id={e.id} />
-          ) : (
-            <VoiceActors links={e.links} />
-          ),
-        )}
-      </div>
+      <Stack data={data} />
     </>
   );
 };
+
 
 type Anime = {
   id: number;
