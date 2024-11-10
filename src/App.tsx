@@ -1,6 +1,7 @@
 import "./App.css";
 import { Link, Routes, Route, useNavigate } from "react-router-dom";
 import Game from "./game/Game";
+import Playground from "./dev/Dev";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -35,11 +36,19 @@ function App() {
     </div>
   );
 
+  if (process.env.REACT_APP_IS_PLAYGROUND === "true") {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Playground />
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
         <Route path="/" element={home} />
-        <Route path="/game/:id" element={<Game/>} />
+        <Route path="/game/:id" element={<Game />} />
       </Routes>
     </QueryClientProvider>
   );
