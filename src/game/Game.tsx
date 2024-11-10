@@ -6,6 +6,7 @@ import { nanoid } from "nanoid";
 import Lobby from "../lobby/Lobby";
 import Select from "react-select";
 import { VoiceActors, ConcreteLink } from "./VoiceActor";
+import AnimeCard from "./AnimeCard";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };
 
@@ -69,24 +70,6 @@ const SearchBar = ({ onSelect }: { onSelect: (id: number) => void }) => {
         onChange={(e: any) => onSelect(e.value)}
         filterOption={() => true}
       />
-    </>
-  );
-};
-type AnimeDetails = {
-  id: number;
-  title?: string;
-  englishTitle?: string;
-  imageUrl?: string;
-};
-
-const AnimeCard = ({ id }: { id: number }) => {
-  const { isLoading, data: details } = useAnimeDetails(id);
-  if (isLoading || !details) return <div>Loading...</div>;
-
-  return (
-    <>
-      <header>{details?.title}</header>
-      <img src={details.imageUrl} alt={details?.title} />
     </>
   );
 };
@@ -261,22 +244,6 @@ const useGameState = (id: number) => {
     linkages: usedLinkages,
   };
 };
-
-const useAnimeDetails = (id: number) =>
-  useQuery({
-    queryKey: ["animeDetails", id],
-    queryFn: async () => {
-      const response = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
-      const res = await response.json();
-
-      return {
-        id,
-        title: res?.data?.title,
-        title_english: res?.data?.title_english,
-        imageUrl: res?.data?.images?.webp?.image_url,
-      } as AnimeDetails;
-    },
-  });
 
 const computeLinks = (to: Linkage[], from: Linkage[]) => {
   const ids = Array.from(
