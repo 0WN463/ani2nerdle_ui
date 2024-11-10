@@ -269,7 +269,6 @@ const useGameState = (id: number) => {
     linkages.map((l) => l.data ?? []),
     computeLinks,
   );
-  console.log("PAIR", usedLinkages);
 
   const addNextAnime = (id: number) => {
     setState({ animes: [{ id }, ...state.animes], linkages: state.linkages });
