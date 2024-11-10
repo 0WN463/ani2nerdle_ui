@@ -5,6 +5,7 @@ import { socket } from "../lib/socket";
 import { nanoid } from "nanoid";
 import Lobby from "../lobby/Lobby";
 import Select from "react-select";
+import { VoiceActors, ConcreteLink } from "./VoiceActor";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };
 
@@ -89,32 +90,6 @@ const AnimeCard = ({ id }: { id: number }) => {
     </>
   );
 };
-
-const VoiceActors = ({ links }: { links: ConcreteLink[] }) => (
-  <div style={{ display: "flex", gap: "4em" }}>
-    {links.map((l) => (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          {l.link.to.map((c) => (
-            <div id={c.name}>{c.name}</div>
-          ))}
-        </div>
-        <div> {l.name} </div>
-        <div>
-          {l.link.from.map((c) => (
-            <div id={c.name}>{c.name}</div>
-          ))}
-        </div>
-      </div>
-    ))}
-  </div>
-);
 
 const Game = ({ id: firstAnime }: { id: number }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
@@ -303,17 +278,6 @@ const useAnimeDetails = (id: number) =>
     },
   });
 
-type Character = {
-  name: string;
-  image_url: string;
-};
-
-type ConcreteLink = {
-  id: number;
-  name: string;
-  link: { from: Character[]; to: Character[] };
-};
-
 const computeLinks = (to: Linkage[], from: Linkage[]) => {
   const ids = Array.from(
     new Set(
@@ -371,11 +335,9 @@ const Page = () => {
     setStage({ type: "game", animeId });
   };
 
-
   useEffect(() => {
     socket.emit("join_game", { game_id: id, player_id: nanoid() });
   }, [id]);
-
 
 
   const game =
@@ -383,7 +345,6 @@ const Page = () => {
       <Lobby onGameStarted={onGameStart} />
     ) : (
       <>
-        <div> game {id} </div>
         <Game id={stage.animeId} />
       </>
     );
