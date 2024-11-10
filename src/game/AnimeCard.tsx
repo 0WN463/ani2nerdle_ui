@@ -28,10 +28,10 @@ const AnimeCard = ({ id }: { id: number }) => {
   if (isLoading || !details) return <div>Loading...</div>;
 
   return (
-    <>
+    <figure>
       <img src={details.imageUrl} alt={details?.title} />
-      <header>{details?.title}</header>
-    </>
+      <figcaption style={{textAlign: "center"}}>{details?.title}</figcaption>
+    </figure>
   );
 };
 
