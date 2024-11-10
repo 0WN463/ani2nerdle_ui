@@ -31,7 +31,7 @@ const SearchBar = ({ onSelect }: { onSelect: (id: number) => void }) => {
     queryKey: ["searchAnime", searchTerm],
     queryFn: async () => {
       const response = await fetch(
-        `https://api.jikan.moe/v4/anime?q=${searchTerm}&sfw=true`,
+        `https://api.jikan.moe/v4/anime?q=${searchTerm}&sfw=true&order_by=popularity`,
       );
       return await response.json();
     },
