@@ -30,7 +30,7 @@ const AnimeCard = ({ id }: { id: number }) => {
   return (
     <figure>
       <img src={details.imageUrl} alt={details?.title} />
-      <figcaption style={{textAlign: "center"}}>{details?.title}</figcaption>
+      <figcaption style={{ textAlign: "center" }}>{details?.title}</figcaption>
     </figure>
   );
 };

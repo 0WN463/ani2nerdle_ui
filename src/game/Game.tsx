@@ -5,7 +5,7 @@ import { socket } from "../lib/socket";
 import { nanoid } from "nanoid";
 import Lobby from "../lobby/Lobby";
 import Select from "react-select";
-import {  ConcreteLink } from "./VoiceActor";
+import { ConcreteLink } from "./VoiceActor";
 import Stack from "./Stack";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };
@@ -35,7 +35,7 @@ const SearchBar = ({ onSelect }: { onSelect: (id: number) => void }) => {
     queryKey: ["searchAnime", searchTerm],
     queryFn: async () => {
       const response = await fetch(
-        `https://api.jikan.moe/v4/anime?q=${searchTerm}&sfw=true&order_by=popularity`,
+        `https://api.jikan.moe/v4/anime?q=${searchTerm}&sfw=true`,
       );
       return await response.json();
     },
@@ -117,7 +117,6 @@ const Game = ({ id: firstAnime }: { id: number }) => {
     </>
   );
 };
-
 
 type Anime = {
   id: number;
@@ -292,7 +291,6 @@ const Page = () => {
   useEffect(() => {
     socket.emit("join_game", { game_id: id, player_id: nanoid() });
   }, [id]);
-
 
   const game =
     stage.type === "lobby" ? (
