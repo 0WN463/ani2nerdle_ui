@@ -1,6 +1,6 @@
 import "./App.css";
 import { Link, Routes, Route, useNavigate } from "react-router-dom";
-import Lobby from "./lobby/Lobby";
+import Game from "./game/Game";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -39,7 +39,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Routes>
         <Route path="/" element={home} />
-        <Route path="/game/:id" element={<Lobby />} />
+        <Route path="/game/:id" element={<Game/>} />
       </Routes>
     </QueryClientProvider>
   );
