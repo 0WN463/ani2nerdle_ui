@@ -7,6 +7,7 @@ import Lobby from "../lobby/Lobby";
 import Select from "react-select";
 import { ConcreteLink } from "./VoiceActor";
 import Stack from "./Stack";
+import toast, { Toaster } from "react-hot-toast";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };
 
@@ -100,8 +101,12 @@ const Game = ({ id: firstAnime }: { id: number }) => {
       candidateLinkages,
     );
 
-    if (validLinkages.length) socket.emit("send anime", selectedAnime);
-
+    if (validLinkages.length) {
+      toast.success("Linked!");
+      socket.emit("send anime", selectedAnime);
+    } else {
+      toast.error("No links there");
+    }
     setSelectedAnime(undefined);
   }, [selectedAnime, activeLinkage, candidateLinkages]);
 
@@ -114,6 +119,7 @@ const Game = ({ id: firstAnime }: { id: number }) => {
     <>
       <SearchBar onSelect={setSelectedAnime} />
       <Stack data={data} />
+      <Toaster />
     </>
   );
 };
