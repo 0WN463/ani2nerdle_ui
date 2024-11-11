@@ -10,13 +10,15 @@ const Playground = () => (
           from: [
             {
               name: "First character",
-              image_url: "",
+              image_url:
+                "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
             },
           ],
           to: [
             {
               name: "First character",
-              image_url: "",
+              image_url:
+                "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
             },
           ],
         },
@@ -30,11 +32,13 @@ const Playground = () => (
           from: [
             {
               name: "First character",
-              image_url: "",
+              image_url:
+                "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
             },
             {
               name: "Second character",
-              image_url: "",
+              image_url:
+                "https://cdn.myanimelist.net/images/characters/5/464903.webp?s=8a4c1a500e00fe55746dd8d259401513",
             },
           ],
           to: [
