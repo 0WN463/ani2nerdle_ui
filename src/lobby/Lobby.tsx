@@ -24,10 +24,20 @@ const Lobby = ({
   };
 
   return (
-    <>
-      <div> lobby </div>
-      <button onClick={startGame}> Start </button>
-    </>
+    <div className="App" style={{ position: "relative", height: "100vh" }}>
+      <div
+        style={{
+          top: "80%",
+          position: "absolute",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <button style={{ fontSize: "xx-large" }} onClick={startGame}>
+          Start
+        </button>
+      </div>
+    </div>
   );
 };
 

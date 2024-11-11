@@ -1,5 +1,4 @@
-import "./App.css";
-import { Link, Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Game from "./game/Game";
 import Playground from "./dev/Dev";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -28,11 +27,26 @@ function App() {
   };
 
   const home = (
-    <div className="App">
-      <header className="Ani2Nerdle">
+    <div className="App" style={{ position: "relative", height: "100vh" }}>
+      <div
+        style={{
+          top: "80%",
+          position: "absolute",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "3em",
+        }}
+      >
+        <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
+          <div style={{ fontSize: "xxx-large" }}>
+            ANI2<span style={{ color: "aquamarine" }}>NERDLE</span>
+            <span style={{ color: "coral" }}>BATTLE</span>
+          </div>
+        </header>
         <button onClick={createRoom}> Create Room </button>
-        <Link to="game"> Game </Link>
-      </header>
+      </div>
     </div>
   );
 
