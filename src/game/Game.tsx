@@ -136,6 +136,7 @@ type GameState = {
 type Linkage = {
   name: string;
   id: number;
+  role: string;
   image_url: string;
   chara_name: string;
   chara_img_url?: string;
@@ -192,6 +193,7 @@ const useLinkages = (animeIds: number[]) => {
           return {
             name: japVa.person.name,
             id: japVa.person.mal_id,
+            role: data.role,
             image_url: japVa.person.images?.jpg?.image_url,
             chara_name: data.character.name,
             chara_img_url: data.character.images.webp.image_url,
@@ -240,6 +242,20 @@ const useGameState = (id: number) => {
 };
 
 const computeLinks = (to: Linkage[], from: Linkage[]) => {
+  const createMap = (links: Linkage[]) => {
+    const map = new Map();
+
+    links.forEach((l) => {
+      if (map.get(l.id)?.role === "Main") return;
+
+      map.set(l.id, l);
+    });
+
+    return map;
+  };
+  const fromMap = createMap(from);
+  const toMap = createMap(to);
+
   const ids = Array.from(
     new Set(
       intersection(
@@ -248,6 +264,12 @@ const computeLinks = (to: Linkage[], from: Linkage[]) => {
       ),
     ),
   );
+
+  const toScore = (m: Map<number, Linkage>, id: number) =>
+    m.get(id)?.role === "Main" ? 2 : 1;
+  const totalScore = (id: number) => toScore(fromMap, id) + toScore(toMap, id);
+
+  ids.sort((a, b) => totalScore(b) - totalScore(a));
 
   const linkToChar = (l: Linkage) => ({
     name: l.chara_name,
@@ -258,8 +280,8 @@ const computeLinks = (to: Linkage[], from: Linkage[]) => {
     (id) =>
       ({
         id,
-        name: (from.find((l) => l.id === id) as Linkage).name,
-        image_url: (from.find((l) => l.id === id) as Linkage).image_url,
+        name: fromMap.get(id)?.name,
+        image_url: fromMap.get(id)?.image_url,
         link: {
           from: from.filter((l) => l.id === id).map(linkToChar),
           to: to.filter((l) => l.id === id).map(linkToChar),

@@ -119,7 +119,7 @@ const VoiceActors = ({ links }: { links: ConcreteLink[] }) => (
       gap: "4em",
       maxWidth: "60%",
       overflowX: "scroll",
-      padding: "0 40%",
+      padding: "0 20%",
     }}
   >
     {links.map((l) => (
