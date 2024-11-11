@@ -33,6 +33,7 @@ export const CharacterDetail = ({
           style={{
             width: "5em",
             position: "absolute",
+            zIndex: "1",
             ...(imageAnchor === "top" ? { top: 0 } : { bottom: 0 }),
           }}
         />
@@ -81,8 +82,9 @@ const VoiceActors = ({ links }: { links: ConcreteLink[] }) => (
     style={{
       display: "flex",
       gap: "4em",
-      maxWidth: "100%",
-      overflow: "scroll",
+      maxWidth: "60%",
+      overflowX: "scroll",
+      padding: "0 40%",
     }}
   >
     {links.map((l) => (
