@@ -130,6 +130,7 @@ type GameState = {
 type Linkage = {
   name: string;
   id: number;
+  image_url: string;
   chara_name: string;
   chara_img_url?: string;
 };
@@ -185,6 +186,7 @@ const useLinkages = (animeIds: number[]) => {
           return {
             name: japVa.person.name,
             id: japVa.person.mal_id,
+            image_url: japVa.person.images?.jpg?.image_url,
             chara_name: data.character.name,
             chara_img_url: data.character.images.webp.image_url,
           };
@@ -251,12 +253,13 @@ const computeLinks = (to: Linkage[], from: Linkage[]) => {
       ({
         id,
         name: (from.find((l) => l.id === id) as Linkage).name,
+        image_url: (from.find((l) => l.id === id) as Linkage).image_url,
         link: {
           from: from.filter((l) => l.id === id).map(linkToChar),
           to: to.filter((l) => l.id === id).map(linkToChar),
         },
       }) as ConcreteLink,
-  );
+  ); // TODO: sort by support/main role
 };
 const intersection = <T,>(a: T[], b: T[]) => a?.filter((e) => b?.includes(e));
 

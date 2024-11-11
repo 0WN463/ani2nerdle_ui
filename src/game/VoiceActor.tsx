@@ -10,10 +10,11 @@ type Character = {
 export type ConcreteLink = {
   id: number;
   name: string;
+  image_url?: string;
   link: { from: Character[]; to: Character[] };
 };
 
-export const CharacterDetail = ({
+const CharacterDetail = ({
   name,
   image_url,
   imageAnchor,
@@ -39,6 +40,37 @@ export const CharacterDetail = ({
         />
       )}
     </span>
+  );
+};
+
+const VoiceActorDetails = ({
+  name,
+  image_url,
+}: {
+  name: string;
+  image_url?: string;
+}) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      style={{ whiteSpace: "nowrap", position: "relative" }}
+      onMouseOver={() => setOpen(true)}
+      onMouseOut={() => setOpen(false)}
+    >
+      {name}
+      {open && (
+        <img
+          src={image_url}
+          style={{
+            width: "5em",
+            position: "absolute",
+            zIndex: "1",
+            transform: "translateY(-50%)",
+          }}
+        />
+      )}
+    </div>
   );
 };
 
@@ -68,7 +100,10 @@ export const VoiceActor = ({
         <CharacterDetail {...{ imageAnchor: "top", ...c }} />
       ))}
     </div>
-    <div style={{ whiteSpace: "nowrap" }}> {concreteLink.name} </div>
+    <VoiceActorDetails
+      name={concreteLink.name}
+      image_url={concreteLink.image_url}
+    />
     <div>
       {concreteLink.link.from.map((c) => (
         <CharacterDetail {...{ imageAnchor: "bottom", ...c }} />
