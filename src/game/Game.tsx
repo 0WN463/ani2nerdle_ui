@@ -29,7 +29,13 @@ const useDebounce = <T,>(value: T, delay: number) => {
   return [debouncedValue, setState] as const;
 };
 
-const SearchBar = ({ onSelect }: { onSelect: (id: number) => void }) => {
+const SearchBar = ({
+  onSelect,
+  isDisabled,
+}: {
+  onSelect: (id: number) => void;
+  isDisabled: (id: number) => boolean;
+}) => {
   const [searchTerm, setSearchTerm] = useDebounce("", 300);
 
   const { error, data: res } = useQuery({
@@ -53,6 +59,7 @@ const SearchBar = ({ onSelect }: { onSelect: (id: number) => void }) => {
   const options = res?.data?.map((a: any) => ({
     value: a?.mal_id,
     label: formatLabel(a),
+    isDisabled: isDisabled(a?.mal_id),
   }));
 
   const errorDisplay = error ? (
@@ -111,13 +118,16 @@ const Game = ({ id: firstAnime }: { id: number }) => {
   }, [selectedAnime, activeLinkage, candidateLinkages]);
 
   const data = interleave(
-    state.animes.map((a) => ({ type: "anime" as const, id: a.id })),
+    state.animes.map((a) => ({ type: "anime" as const, id: a })),
     linkages.map((e) => ({ type: "links" as const, links: e })),
   );
 
   return (
     <>
-      <SearchBar onSelect={setSelectedAnime} />
+      <SearchBar
+        onSelect={setSelectedAnime}
+        isDisabled={(id) => state.animes.includes(id)}
+      />
       <Stack data={data} />
       <Toaster />
     </>
@@ -129,8 +139,7 @@ type Anime = {
 };
 
 type GameState = {
-  animes: Anime[];
-  linkages: number[];
+  animes: number[];
 };
 
 type Linkage = {
@@ -215,28 +224,22 @@ const pairMap = <T, U>(arr: T[], func: (_a: T, _b: T) => U) =>
 
 const useGameState = (id: number) => {
   const [state, setState] = useState<GameState>({
-    animes: [{ id }],
-    linkages: [],
+    animes: [id],
   });
-  const linkages = useLinkages(state.animes.map((a) => a.id));
+  const linkages = useLinkages(state.animes);
   const usedLinkages = pairMap(
     linkages.map((l) => l.data ?? []),
     computeLinks,
   );
 
   const addNextAnime = (id: number) => {
-    setState({ animes: [{ id }, ...state.animes], linkages: state.linkages });
-  };
-
-  const addLinkage = (linkage: number) => {
-    setState({ animes: state.animes, linkages: [linkage, ...state.linkages] });
+    setState({ animes: [id, ...state.animes] });
   };
 
   return {
     state,
     activeLinkage: linkages[0].data,
     addNextAnime,
-    addLinkage,
     linkages: usedLinkages,
   };
 };
