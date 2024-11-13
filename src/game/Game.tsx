@@ -63,6 +63,54 @@ const Game = ({ id: firstAnime }: { id: number }) => {
   );
 };
 
+const GameSoloWrapper = () => {
+  const { data: firstAnime } = useRandomPopularAnime();
+
+  return firstAnime && <GameSolo firstAnime={firstAnime} />;
+};
+
+export { GameSoloWrapper as GameSolo };
+
+const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
+  const [selectedAnime, setSelectedAnime] = useState<number>();
+  const { activeLinkage, addNextAnime, state, linkages } =
+    useGameState(firstAnime);
+  const { data: candidateLinkages } = useLinkage(selectedAnime);
+
+  useEffect(() => {
+    if (!candidateLinkages || !selectedAnime) return;
+
+    const validLinkages = linkageIntersection(
+      activeLinkage ?? [],
+      candidateLinkages,
+    );
+
+    if (validLinkages.length) {
+      toast.success("Linked!");
+      addNextAnime(selectedAnime);
+    } else {
+      toast.error("No links there");
+    }
+    setSelectedAnime(undefined);
+  }, [selectedAnime, activeLinkage, candidateLinkages, addNextAnime]);
+
+  const data = interleave(
+    state.animes.map((a) => ({ type: "anime" as const, id: a })),
+    linkages.map((e) => ({ type: "links" as const, links: e })),
+  );
+
+  return (
+    <>
+      <SearchBar
+        onSelect={setSelectedAnime}
+        isDisabled={(id) => state.animes.includes(id)}
+      />
+      {<Stack data={data} />}
+      <Toaster />
+    </>
+  );
+};
+
 type GameState = {
   animes: number[];
 };
@@ -74,6 +122,22 @@ type Linkage = {
   image_url: string;
   chara_name: string;
   chara_img_url?: string;
+};
+
+const useRandomPopularAnime = () => {
+  return useQuery({
+    queryKey: ["popularAnimes"],
+    queryFn: async () => {
+      const response = await fetch(
+        "https://api.jikan.moe/v4/top/anime?type=tv&filter=bypopularity",
+      );
+      const res = await response.json();
+      const animeIds = res?.data?.map((a: any) => a.mal_id);
+      console.log(animeIds);
+      return animeIds[Math.floor(Math.random() * animeIds.length)];
+    },
+    staleTime: 0,
+  });
 };
 
 const useLinkage = (animeId?: number) => {
