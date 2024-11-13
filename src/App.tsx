@@ -14,8 +14,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const URL =
-  process.env.NODE_ENV === "production" ? "" : "http://localhost:3000";
+const URL = process.env.REACT_APP_WEB_SERVICE_URL;
 
 function App() {
   const navigate = useNavigate();
