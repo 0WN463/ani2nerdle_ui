@@ -118,7 +118,7 @@ const VoiceActors = ({ links }: { links: ConcreteLink[] }) => (
       display: "flex",
       gap: "4em",
       maxWidth: "60%",
-      overflowX: "scroll",
+      overflowX: "auto",
       padding: "0 20%",
     }}
   >
