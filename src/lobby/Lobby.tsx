@@ -13,6 +13,10 @@ const Lobby = ({
    * */
 
   useEffect(() => {
+    socket.connect();
+  }, []);
+
+  useEffect(() => {
     socket.on("start game", onGameStarted);
     return () => {
       socket.off("start game", onGameStarted);
