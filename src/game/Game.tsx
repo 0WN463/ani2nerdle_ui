@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { socket } from "../lib/socket";
 import { nanoid } from "nanoid";
@@ -70,28 +70,57 @@ const GameSoloWrapper = () => {
 
 export { GameSoloWrapper as GameSolo };
 
+const useLimit = () => {
+  const [searchParams] = useSearchParams();
+
+  const param = searchParams.get("limit");
+
+  if (!param) return 3;
+
+  return param === "unlimited" ? Infinity : parseInt(param);
+};
+
 const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
-  const { activeLinkage, addNextAnime, state, linkages } =
+  const { activeLinkage, addNextAnime, state, linkages, linkUsages } =
     useGameState(firstAnime);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
+  const linkLimit = useLimit();
 
   useEffect(() => {
     if (!candidateLinkages || !selectedAnime) return;
 
-    const validLinkages = linkageIntersection(
+    const sharedLinks = linkageIntersection(
       activeLinkage ?? [],
       candidateLinkages,
+    );
+
+    const validLinkages = sharedLinks.filter(
+      (l) => (linkUsages.get(l) ?? 0) < linkLimit,
     );
 
     if (validLinkages.length) {
       toast.success("Linked!");
       addNextAnime(selectedAnime);
     } else {
-      toast.error("No links there");
+      if (sharedLinks.length === 0) {
+        toast.error("No links there");
+      } else {
+        const names = sharedLinks.map(
+          (id) => activeLinkage?.find((al) => al.id === id)?.name,
+        );
+
+        toast.error(`All links striked out:\n\n${names.join("\n")}`);
+      }
     }
     setSelectedAnime(undefined);
-  }, [selectedAnime, activeLinkage, candidateLinkages, addNextAnime]);
+  }, [
+    selectedAnime,
+    activeLinkage,
+    candidateLinkages,
+    addNextAnime,
+    linkUsages,
+  ]);
 
   const data = interleave(
     state.animes.map((a) => ({ type: "anime" as const, id: a })),
@@ -132,7 +161,7 @@ const useRandomPopularAnime = () => {
       );
       const res = await response.json();
       const animeIds = res?.data?.map((a: any) => a.mal_id);
-      console.log(animeIds);
+
       return animeIds[Math.floor(Math.random() * animeIds.length)];
     },
     staleTime: 0,
@@ -224,11 +253,20 @@ const useGameState = (id: number) => {
     setState({ animes: [id, ...state.animes] });
   };
 
+  const linkUsages = usedLinkages
+    .flat()
+    .map((l) => l.id)
+    .reduce((acc, v) => {
+      acc.set(v, (acc.get(v) ?? 0) + 1);
+      return acc;
+    }, new Map<number, number>());
+
   return {
     state,
     activeLinkage: linkages[0].data,
     addNextAnime,
     linkages: usedLinkages,
+    linkUsages,
   };
 };
 
