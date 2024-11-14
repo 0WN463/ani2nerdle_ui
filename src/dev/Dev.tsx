@@ -4,6 +4,7 @@ const Playground = () => (
   <div style={{ display: "flex", gap: "5em", justifyContent: "space-around" }}>
     <VoiceActor
       concreteLink={{
+        numUsed: 1,
         id: 1,
         name: "Voice actor name",
         link: {
@@ -26,6 +27,7 @@ const Playground = () => (
     />
     <VoiceActor
       concreteLink={{
+        numUsed: 1,
         id: 1,
         name: "Voice actor name",
         link: {
@@ -52,6 +54,7 @@ const Playground = () => (
     />
     <VoiceActor
       concreteLink={{
+        numUsed: 1,
         id: 1,
         name: "Voice actor name",
         link: {

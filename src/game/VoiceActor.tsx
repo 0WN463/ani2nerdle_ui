@@ -12,6 +12,7 @@ export type ConcreteLink = {
   name: string;
   image_url?: string;
   link: { from: Character[]; to: Character[] };
+  numUsed: number;
 };
 
 const CharacterDetail = ({
@@ -104,6 +105,7 @@ export const VoiceActor = ({
       name={concreteLink.name}
       image_url={concreteLink.image_url}
     />
+    <div style={{ margin: "-2em" }}>{"❌".repeat(concreteLink.numUsed)} </div>
     <div>
       {concreteLink.link.from.map((c) => (
         <CharacterDetail {...{ imageAnchor: "bottom", ...c }} />

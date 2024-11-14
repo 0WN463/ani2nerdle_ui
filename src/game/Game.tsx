@@ -4,7 +4,6 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import { socket } from "../lib/socket";
 import { nanoid } from "nanoid";
 import Lobby from "../lobby/Lobby";
-import { ConcreteLink } from "./VoiceActor";
 import Stack from "./Stack";
 import toast, { Toaster } from "react-hot-toast";
 import SearchBar from "./SearchBar";
@@ -265,21 +264,18 @@ const computeLinks = (to: Linkage[], from: Linkage[]) => {
 
   const linkToChar = (l: Linkage) => ({
     name: l.chara_name,
-    image_url: l.chara_img_url,
+    image_url: l.chara_img_url ?? "",
   });
 
-  return ids.map(
-    (id) =>
-      ({
-        id,
-        name: fromMap.get(id)?.name,
-        image_url: fromMap.get(id)?.image_url,
-        link: {
-          from: from.filter((l) => l.id === id).map(linkToChar),
-          to: to.filter((l) => l.id === id).map(linkToChar),
-        },
-      }) as ConcreteLink,
-  ); // TODO: sort by support/main role
+  return ids.map((id) => ({
+    id,
+    name: fromMap.get(id)?.name,
+    image_url: fromMap.get(id)?.image_url,
+    link: {
+      from: from.filter((l) => l.id === id).map(linkToChar),
+      to: to.filter((l) => l.id === id).map(linkToChar),
+    },
+  })); // TODO: sort by support/main role
 };
 const intersection = <T,>(a: T[], b: T[]) => a?.filter((e) => b?.includes(e));
 
