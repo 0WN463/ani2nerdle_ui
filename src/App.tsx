@@ -64,7 +64,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Routes>
         <Route path="/" element={home} />
-        <Route path="/game/solo" element={<GameSolo />} />
+        <Route path="/solo" element={<GameSolo />} />
         <Route path="/game/:id" element={<Game />} />
       </Routes>
     </QueryClientProvider>
