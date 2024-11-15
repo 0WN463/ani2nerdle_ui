@@ -128,26 +128,43 @@ export const VoiceActor = ({
   </div>
 );
 
+const stableSort = <T,>(arr: T[], fn: (_a: T, _b: T) => number) => {
+  return arr
+    .map((e, i) => ({ ...e, index: i }))
+    .sort((a, b) => (fn(a, b) !== 0 ? fn(a, b) : a.index - b.index));
+};
+
 const VoiceActors = ({
   links,
   linkLimit,
 }: {
   links: ConcreteLink[];
   linkLimit: number;
-}) => (
-  <div
-    style={{
-      display: "flex",
-      gap: "4em",
-      maxWidth: "60%",
-      overflowX: "auto",
-      padding: "0 20%",
-    }}
-  >
-    {links.map((l) => (
-      <VoiceActor concreteLink={l} linkLimit={linkLimit} />
-    ))}
-  </div>
-);
+}) => {
+  const sorted = stableSort(links, (a, b) => {
+    if (a.numUsed === linkLimit) return -1;
+    if (b.numUsed === linkLimit) return 1;
+
+    if (a.numUsed > linkLimit) return 1;
+    if (b.numUsed > linkLimit) return -1;
+
+    return 0;
+  });
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: "4em",
+        maxWidth: "60%",
+        overflowX: "auto",
+        padding: "0 20%",
+      }}
+    >
+      {sorted.map((l) => (
+        <VoiceActor concreteLink={l} linkLimit={linkLimit} />
+      ))}
+    </div>
+  );
+};
 
 export { VoiceActors };
