@@ -96,6 +96,7 @@ export const VoiceActor = ({
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
       backgroundSize: "6em",
+      opacity: concreteLink.numUsed > linkLimit ? 0.8 : 1,
     }}
   >
     <div>
