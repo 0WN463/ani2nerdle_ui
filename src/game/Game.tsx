@@ -171,33 +171,36 @@ const useRandomPopularAnime = () => {
   });
 };
 
+const fetchFn = (animeId?: number) => async () => {
+  const response = await fetch(
+    `https://api.jikan.moe/v4/anime/${animeId}/characters`,
+  );
+  const res = await response.json();
+
+  const charaToLinkage = (data: any) => {
+    const japVa = data.voice_actors.find(
+      (role: any) => role.language === "Japanese",
+    );
+
+    if (!japVa) return null;
+
+    return {
+      name: japVa.person.name,
+      id: japVa.person.mal_id,
+      image_url: japVa.person.images?.jpg?.image_url,
+      chara_name: data.character.name,
+      chara_img_url: data.character.images.webp.image_url,
+    };
+  };
+
+  return res?.data?.map(charaToLinkage).filter((l?: Linkage) => l) as Linkage[];
+};
+
 const useLinkage = (animeId?: number) => {
   return useQuery({
     enabled: !!animeId,
     queryKey: ["animeLinkages", animeId],
-    queryFn: async () => {
-      const response = await fetch(
-        `https://api.jikan.moe/v4/anime/${animeId}/characters`,
-      );
-      const res = await response.json();
-
-      const charaToLinkage = (data: any) => {
-        const japVa = data.voice_actors.find(
-          (role: any) => role.language === "Japanese",
-        );
-
-        if (!japVa) return null;
-
-        return {
-          name: japVa.person.name,
-          id: japVa.person.mal_id,
-          chara_name: data.character.name,
-          chara_img_url: data.character.images.webp.image_url,
-        };
-      };
-
-      return res?.data?.map(charaToLinkage).filter((l?: Linkage) => l);
-    },
+    queryFn: fetchFn(animeId),
   });
 };
 
@@ -206,33 +209,7 @@ const useLinkages = (animeIds: number[]) => {
     queries: animeIds.map((animeId) => ({
       queryKey: ["animeLinkages", animeId],
       enabled: !!animeId,
-      queryFn: async () => {
-        const response = await fetch(
-          `https://api.jikan.moe/v4/anime/${animeId}/characters`,
-        );
-        const res = await response.json();
-
-        const charaToLinkage = (data: any) => {
-          const japVa = data.voice_actors.find(
-            (role: any) => role.language === "Japanese",
-          );
-
-          if (!japVa) return null;
-
-          return {
-            name: japVa.person.name,
-            id: japVa.person.mal_id,
-            role: data.role,
-            image_url: japVa.person.images?.jpg?.image_url,
-            chara_name: data.character.name,
-            chara_img_url: data.character.images.webp.image_url,
-          };
-        };
-
-        return res?.data
-          ?.map(charaToLinkage)
-          .filter((l?: Linkage) => l) as Linkage[];
-      },
+      queryFn: fetchFn(animeId),
     })),
   });
 };
