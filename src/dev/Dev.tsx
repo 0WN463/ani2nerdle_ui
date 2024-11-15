@@ -1,13 +1,14 @@
 import { VoiceActor } from "../game/VoiceActor";
+import { Routes, Route } from "react-router";
 
-const Playground = () => (
-  <div style={{ display: "flex", gap: "5em", justifyContent: "space-around" }}>
+const VoiceActorIndividual = () => {
+  const limit3 = [1, 2, 3, 4].map((i) => (
     <VoiceActor
       linkLimit={3}
       concreteLink={{
-        numUsed: 1,
+        numUsed: i,
         id: 1,
-        name: "Voice actor 1/3",
+        name: `Voice actor ${i}/3`,
         link: {
           from: [
             {
@@ -26,12 +27,15 @@ const Playground = () => (
         },
       }}
     />
+  ));
+
+  const limit1 = [1, 2].map((i) => (
     <VoiceActor
       linkLimit={1}
       concreteLink={{
-        numUsed: 1,
+        numUsed: i,
         id: 1,
-        name: "Voice actor 1/1",
+        name: `Voice actor ${i}/1`,
         link: {
           from: [
             {
@@ -50,88 +54,56 @@ const Playground = () => (
         },
       }}
     />
-    <VoiceActor
-      linkLimit={3}
-      concreteLink={{
-        numUsed: 2,
-        id: 1,
-        name: "Voice actor 2/3",
-        link: {
-          from: [
-            {
-              name: "First character",
-              image_url:
-                "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
-            },
-          ],
-          to: [
-            {
-              name: "First character",
-              image_url: "",
-            },
-          ],
-        },
-      }}
-    />
-    <VoiceActor
-      linkLimit={3}
-      concreteLink={{
-        numUsed: 3,
-        id: 1,
-        name: "Voice actor 3/3",
-        link: {
-          from: [
-            {
-              name: "First character",
-              image_url:
-                "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
-            },
-            {
-              name: "Second character",
-              image_url:
-                "https://cdn.myanimelist.net/images/characters/5/464903.webp?s=8a4c1a500e00fe55746dd8d259401513",
-            },
-          ],
-          to: [
-            {
-              name: "First character",
-              image_url: "",
-            },
-          ],
-        },
-      }}
-    />
+  ));
+
+  const unlimited = [1, 2, 3].map((i) => (
     <VoiceActor
       linkLimit={Infinity}
       concreteLink={{
-        numUsed: 3,
+        numUsed: i,
         id: 1,
-        name: "Voice actor 3/unlimited",
+        name: `Voice actor ${i}`,
         link: {
           from: [
             {
               name: "First character",
-              image_url: "",
-            },
-            {
-              name: "Second character",
-              image_url: "",
+              image_url:
+                "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
             },
           ],
           to: [
             {
               name: "First character",
-              image_url: "",
-            },
-            {
-              name: "Second character",
-              image_url: "",
+              image_url:
+                "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
             },
           ],
         },
       }}
     />
-  </div>
+  ));
+
+  return (
+    <>
+      {[limit3, limit1, unlimited].map((vas) => (
+        <div
+          style={{
+            display: "flex",
+            gap: "5em",
+            justifyContent: "space-around",
+          }}
+        >
+          {vas}
+        </div>
+      ))}
+    </>
+  );
+};
+
+const Playground = () => (
+  <Routes>
+    <Route path="/voice_actor" element={<VoiceActorIndividual />} />
+  </Routes>
 );
 
 export default Playground;
