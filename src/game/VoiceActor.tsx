@@ -112,11 +112,11 @@ export const VoiceActor = ({
         style={{
           margin: "-2em",
           padding: "0 0.5em",
-          background: concreteLink.numUsed === linkLimit ? "gold" : "none",
+          background: concreteLink.numUsed >= linkLimit ? "gold" : "none",
           borderRadius: "1em",
         }}
       >
-        {"❌".repeat(concreteLink.numUsed)}{" "}
+        {"❌".repeat(Math.min(concreteLink.numUsed, linkLimit))}
       </div>
     )}
     <div>
