@@ -56,7 +56,7 @@ const Game = ({ id: firstAnime }: { id: number }) => {
         onSelect={setSelectedAnime}
         isDisabled={(id) => state.animes.includes(id)}
       />
-      <Stack data={data} />
+      <Stack data={data} linkLimit={Infinity} />
       <Toaster />
     </>
   );
@@ -120,6 +120,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
     candidateLinkages,
     addNextAnime,
     linkUsages,
+    linkLimit,
   ]);
 
   const data = interleave(
@@ -133,7 +134,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
         onSelect={setSelectedAnime}
         isDisabled={(id) => state.animes.includes(id)}
       />
-      {<Stack data={data} />}
+      <Stack data={data} linkLimit={linkLimit} />
       <Toaster />
     </>
   );

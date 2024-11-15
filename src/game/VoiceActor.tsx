@@ -77,8 +77,10 @@ const VoiceActorDetails = ({
 
 export const VoiceActor = ({
   concreteLink,
+  linkLimit,
 }: {
   concreteLink: ConcreteLink;
+  linkLimit: number;
 }) => (
   <div
     style={{
@@ -105,7 +107,18 @@ export const VoiceActor = ({
       name={concreteLink.name}
       image_url={concreteLink.image_url}
     />
-    <div style={{ margin: "-2em" }}>{"❌".repeat(concreteLink.numUsed)} </div>
+    {linkLimit !== Infinity && (
+      <div
+        style={{
+          margin: "-2em",
+          padding: "0 0.5em",
+          background: concreteLink.numUsed === linkLimit ? "gold" : "none",
+          borderRadius: "1em",
+        }}
+      >
+        {"❌".repeat(concreteLink.numUsed)}{" "}
+      </div>
+    )}
     <div>
       {concreteLink.link.from.map((c) => (
         <CharacterDetail {...{ imageAnchor: "bottom", ...c }} />
@@ -114,7 +127,13 @@ export const VoiceActor = ({
   </div>
 );
 
-const VoiceActors = ({ links }: { links: ConcreteLink[] }) => (
+const VoiceActors = ({
+  links,
+  linkLimit,
+}: {
+  links: ConcreteLink[];
+  linkLimit: number;
+}) => (
   <div
     style={{
       display: "flex",
@@ -125,7 +144,7 @@ const VoiceActors = ({ links }: { links: ConcreteLink[] }) => (
     }}
   >
     {links.map((l) => (
-      <VoiceActor concreteLink={l} />
+      <VoiceActor concreteLink={l} linkLimit={linkLimit} />
     ))}
   </div>
 );

@@ -13,7 +13,13 @@ type Links = {
 
 type StackProps = (Anime | Links)[];
 
-const Stack = ({ data }: { data: StackProps }) => {
+const Stack = ({
+  data,
+  linkLimit,
+}: {
+  data: StackProps;
+  linkLimit: number;
+}) => {
   const links = data.filter((_, i) => i % 2 === 1) as Links[];
 
   const augmentOccurrences = (
@@ -52,7 +58,7 @@ const Stack = ({ data }: { data: StackProps }) => {
         e.type === "anime" ? (
           <AnimeCard key={e.id} id={e.id} />
         ) : (
-          <VoiceActors links={result[(i - 1) / 2]} />
+          <VoiceActors links={result[(i - 1) / 2]} linkLimit={linkLimit} />
         ),
       )}
     </div>
