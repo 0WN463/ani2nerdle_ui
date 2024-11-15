@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 
@@ -23,9 +23,11 @@ const useDebounce = <T,>(value: T, delay: number) => {
 const SearchBar = ({
   onSelect,
   isDisabled,
+  style,
 }: {
   onSelect: (id: number) => void;
   isDisabled: (id: number) => boolean;
+  style?: CSSProperties;
 }) => {
   const [searchTerm, setSearchTerm] = useDebounce("", 300);
 
@@ -61,7 +63,7 @@ const SearchBar = ({
   ) : null;
 
   return (
-    <>
+    <div style={style}>
       {errorDisplay}
       <Select
         onInputChange={setSearchTerm}
@@ -69,7 +71,7 @@ const SearchBar = ({
         onChange={(e: any) => onSelect(e.value)}
         filterOption={() => true}
       />
-    </>
+    </div>
   );
 };
 
