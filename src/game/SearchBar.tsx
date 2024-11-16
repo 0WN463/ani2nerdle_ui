@@ -1,4 +1,4 @@
-import { useState, useEffect, CSSProperties } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 
@@ -23,11 +23,11 @@ const useDebounce = <T,>(value: T, delay: number) => {
 const SearchBar = ({
   onSelect,
   isDisabled,
-  style,
+  className,
 }: {
   onSelect: (id: number) => void;
   isDisabled: (id: number) => boolean;
-  style?: CSSProperties;
+  className: string;
 }) => {
   const [searchTerm, setSearchTerm] = useDebounce("", 300);
 
@@ -44,7 +44,7 @@ const SearchBar = ({
 
   const formatLabel = (a: any) => (
     <>
-      <header style={{ fontWeight: "bold" }}>{a?.title}</header>
+      <header className="font-bold">{a?.title}</header>
       <div>{a?.title_english}</div>
     </>
   );
@@ -63,7 +63,7 @@ const SearchBar = ({
   ) : null;
 
   return (
-    <div style={style}>
+    <div className={className}>
       {errorDisplay}
       <Select
         onInputChange={setSearchTerm}

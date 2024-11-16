@@ -55,7 +55,7 @@ const Game = ({ id: firstAnime }: { id: number }) => {
       <SearchBar
         onSelect={setSelectedAnime}
         isDisabled={(id) => state.animes.includes(id)}
-        style={{ margin: "1em 0.5em" }}
+        className="mx-4 my-2"
       />
       <Stack data={data} linkLimit={Infinity} />
       <Toaster />
@@ -134,7 +134,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
       <SearchBar
         onSelect={setSelectedAnime}
         isDisabled={(id) => state.animes.includes(id)}
-        style={{ margin: "1em 0.5em" }}
+        className="mx-4 my-2"
       />
       <Stack data={data} linkLimit={linkLimit} />
       <Toaster />
