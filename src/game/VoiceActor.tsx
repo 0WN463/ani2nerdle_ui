@@ -1,5 +1,3 @@
-import chain from "./chain-svgrepo-com.svg";
-
 import { useState } from "react";
 
 type Character = {
@@ -24,7 +22,7 @@ const CharacterDetail = ({
   return (
     <span
       id={name}
-      style={{ margin: "1em", whiteSpace: "nowrap", position: "relative" }}
+      className="whitespace-nowrap relative"
       onMouseOver={() => setOpen(true)}
       onMouseOut={() => setOpen(false)}
     >
@@ -32,12 +30,7 @@ const CharacterDetail = ({
       {open && (
         <img
           src={image_url}
-          style={{
-            width: "5em",
-            position: "absolute",
-            zIndex: "1",
-            ...(imageAnchor === "top" ? { top: 0 } : { bottom: 0 }),
-          }}
+          className={`z-10 max-w-none w-20 absolute left-full ${imageAnchor === "top" ? "top-0" : "bottom-0"}`}
         />
       )}
     </span>
@@ -55,7 +48,7 @@ const VoiceActorDetails = ({
 
   return (
     <div
-      style={{ whiteSpace: "nowrap", position: "relative" }}
+      className="whitespace-nowrap relative"
       onMouseOver={() => setOpen(true)}
       onMouseOut={() => setOpen(false)}
     >
@@ -63,12 +56,7 @@ const VoiceActorDetails = ({
       {open && (
         <img
           src={image_url}
-          style={{
-            width: "5em",
-            position: "absolute",
-            zIndex: "1",
-            transform: "translateY(-50%)",
-          }}
+          className={`z-10 w-20 absolute left-full -translate-y-1/2`}
         />
       )}
     </div>
@@ -83,21 +71,20 @@ export const VoiceActor = ({
   linkLimit: number;
 }) => (
   <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      background: "#6CB4EE",
-      borderRadius: "1em",
-      padding: "0.4em",
-      gap: "3em",
-      backgroundImage: `url(${chain})`,
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "6em",
-      opacity: concreteLink.numUsed > linkLimit ? 0.8 : 1,
-    }}
+    className={`flex
+  flex-col content-center
+  items-center
+  rounded-lg
+  px-8
+  py-2
+  gap-12
+  bg-[url('/src/game/chain-svgrepo-com.svg')]
+  bg-no-repeat
+  bg-center
+  bg-[length:6em]
+  bg-sky-300
+  ${concreteLink.numUsed > linkLimit && "opacity-60"}
+  `}
   >
     <div>
       {concreteLink.link.to.map((c) => (
@@ -110,12 +97,7 @@ export const VoiceActor = ({
     />
     {linkLimit !== Infinity && (
       <div
-        style={{
-          margin: "-2em",
-          padding: "0 0.5em",
-          background: concreteLink.numUsed >= linkLimit ? "gold" : "none",
-          borderRadius: "1em",
-        }}
+        className={`-my-9 px-2 rounded-full ${concreteLink.numUsed >= linkLimit && "bg-yellow-300"}`}
       >
         {"❌".repeat(Math.min(concreteLink.numUsed, linkLimit))}
       </div>
@@ -151,15 +133,7 @@ const VoiceActors = ({
     return 0;
   });
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "4em",
-        maxWidth: "60%",
-        overflowX: "auto",
-        padding: "0 20%",
-      }}
-    >
+    <div className="flex gap-12 max-w-[80%] overflow-x-auto px-[10%]">
       {sorted.map((l) => (
         <VoiceActor concreteLink={l} linkLimit={linkLimit} />
       ))}

@@ -6,6 +6,8 @@ const VoiceActorsTest = () => {
     id: 1,
     numUsed,
     name: `Voice actor ${index}`,
+    image_url:
+      "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
     link: {
       from: [
         {
@@ -37,6 +39,8 @@ const VoiceActorIndividual = () => {
         numUsed: i,
         id: 1,
         name: `Voice actor ${i}/3`,
+        image_url:
+          "https://cdn.myanimelist.net/images/characters/11/556642.webp?s=ada28fd15a950dfccfc37d41aaea8870",
         link: {
           from: [
             {
