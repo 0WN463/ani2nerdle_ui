@@ -30,25 +30,17 @@ function App() {
   };
 
   const home = (
-    <div className="App" style={{ position: "relative", height: "100vh" }}>
-      <div
-        style={{
-          top: "80%",
-          position: "absolute",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          display: "flex",
-          flexDirection: "column",
-          gap: "3em",
-        }}
-      >
+    <div className="relative h-screen">
+      <div className="absolute top-3/4 left-1/2 flex flex-col gap-10 -translate-y-1/2 -translate-x-1/2">
         <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
-          <div style={{ fontSize: "xxx-large" }}>
-            ANI2<span style={{ color: "aquamarine" }}>NERDLE</span>
-            <span style={{ color: "coral" }}>BATTLE</span>
+          <div className="text-6xl font-bold">
+            ANI2<span className="text-teal-400">NERDLE</span>
+            <span className="text-orange-500">BATTLE</span>
           </div>
         </header>
-        <button onClick={createRoom}> Create Room </button>
+        <button className="rounded-full bg-sky-300" onClick={createRoom}>
+          Create Room
+        </button>
       </div>
     </div>
   );
