@@ -22,7 +22,7 @@ const CharacterDetail = ({
   return (
     <span
       id={name}
-      className="whitespace-nowrap relative"
+      className="whitespace-nowrap relative rounded-full border px-4 mx-1"
       onMouseOver={() => setOpen(true)}
       onMouseOut={() => setOpen(false)}
     >
@@ -56,7 +56,7 @@ const VoiceActorDetails = ({
       {open && (
         <img
           src={image_url}
-          className={`z-10 w-20 absolute left-full -translate-y-1/2`}
+          className={`z-10 max-w-none w-20 absolute mx-2 left-full -translate-y-1/2`}
         />
       )}
     </div>
@@ -75,7 +75,7 @@ export const VoiceActor = ({
   flex-col content-center
   items-center
   rounded-lg
-  px-8
+  px-4
   py-2
   gap-12
   bg-[url('/src/game/chain-svgrepo-com.svg')]
@@ -132,8 +132,9 @@ const VoiceActors = ({
 
     return 0;
   });
+
   return (
-    <div className="flex gap-12 max-w-[80%] overflow-x-auto px-[10%]">
+    <div className="flex gap-12 max-w-full overflow-x-auto px-24">
       {sorted.map((l) => (
         <VoiceActor concreteLink={l} linkLimit={linkLimit} />
       ))}
