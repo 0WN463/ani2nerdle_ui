@@ -107,7 +107,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
       if (sharedLinks.length === 0) {
         toast.error("No links there");
       } else {
-        const names = sharedLinks.map(
+        const names = [...new Set(sharedLinks)].map(
           (id) => activeLinkage?.find((al) => al.id === id)?.name,
         );
 
