@@ -28,11 +28,9 @@ const AnimeCard = ({ id }: { id: number }) => {
   if (isLoading || !details) return <div>Loading...</div>;
 
   return (
-    <figure
-      style={{ alignItems: "center", display: "flex", flexDirection: "column" }}
-    >
+    <figure className="items-center flex flex-col">
       <img src={details.imageUrl} alt={details?.title} />
-      <figcaption style={{ textAlign: "center" }}>{details?.title}</figcaption>
+      <figcaption>{details?.title}</figcaption>
     </figure>
   );
 };
