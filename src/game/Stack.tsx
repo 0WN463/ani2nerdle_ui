@@ -47,13 +47,7 @@ const Stack = ({
   ).reverse();
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
+    <div className="flex flex-col items-center gap-6">
       {data.map((e, i) =>
         e.type === "anime" ? (
           <AnimeCard key={e.id} id={e.id} />
