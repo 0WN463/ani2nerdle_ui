@@ -15,9 +15,9 @@ const queryClient = new QueryClient({
   },
 });
 
-const URL = process.env.REACT_APP_WEB_SERVICE_URL;
+const URL = import.meta.env.VITE_WEB_SERVICE_URL;
 
-function App() {
+const Home = () => {
   const navigate = useNavigate();
 
   const createRoom = async () => {
@@ -29,7 +29,7 @@ function App() {
     navigate("/game/" + content);
   };
 
-  const home = (
+  return (
     <div className="relative h-screen">
       <div className="absolute top-3/4 left-1/2 flex flex-col gap-10 -translate-y-1/2 -translate-x-1/2">
         <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
@@ -44,8 +44,10 @@ function App() {
       </div>
     </div>
   );
+};
 
-  if (process.env.REACT_APP_IS_PLAYGROUND === "true") {
+function App() {
+  if (import.meta.env.VITE_IS_PLAYGROUND === "true") {
     return (
       <QueryClientProvider client={queryClient}>
         <Playground />
@@ -56,7 +58,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        <Route path="/" element={home} />
+        <Route path="/" element={<Home />} />
         <Route path="/solo" element={<LobbySolo />} />
         <Route path="/solo/game" element={<GameSolo />} />
         <Route path="/game/:id" element={<Game />} />
