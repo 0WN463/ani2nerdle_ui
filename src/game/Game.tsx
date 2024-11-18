@@ -77,14 +77,17 @@ const GameSoloWrapper = () => {
 
 export { GameSoloWrapper as GameSolo };
 
-const useLimit = () => {
+const applyIf = <T, U>(fn: (_: T) => U, v: T | null) => (v ? fn(v) : null);
+
+const parseParam = (s: string) => (s === "unlimited" ? Infinity : parseInt(s));
+
+const useConfig = () => {
   const [searchParams] = useSearchParams();
 
-  const param = searchParams.get("limit");
+  const linkLimit = applyIf(parseParam, searchParams.get("link")) ?? 3;
+  const castLimit = applyIf(parseParam, searchParams.get("cast")) ?? 1;
 
-  if (!param) return 3;
-
-  return param === "unlimited" ? Infinity : parseInt(param);
+  return { linkLimit, castLimit };
 };
 
 const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
@@ -92,7 +95,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
   const { activeLinkage, addNextAnime, state, linkages, linkUsages } =
     useGameState(firstAnime);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
-  const linkLimit = useLimit();
+  const config = useConfig();
 
   useEffect(() => {
     if (!candidateLinkages || !selectedAnime) return;
@@ -103,7 +106,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
     );
 
     const validLinkages = sharedLinks.filter(
-      (l) => (linkUsages.get(l) ?? 0) < linkLimit,
+      (l) => (linkUsages.get(l) ?? 0) < config.linkLimit,
     );
 
     if (validLinkages.length) {
@@ -127,7 +130,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
     candidateLinkages,
     addNextAnime,
     linkUsages,
-    linkLimit,
+    config.linkLimit,
   ]);
 
   const data = interleave(
@@ -142,7 +145,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
         isDisabled={(id) => state.animes.includes(id)}
         className="mx-4 my-2"
       />
-      <Stack data={data} linkLimit={linkLimit} />
+      <Stack data={data} linkLimit={config.linkLimit} />
       <Toaster />
       <PanelBar
         className="fixed bottom-4 left-3/4"

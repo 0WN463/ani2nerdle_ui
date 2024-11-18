@@ -74,7 +74,7 @@ const Lobby = () => {
             navigate({
               pathname: "/solo/game",
               search: createSearchParams({
-                limit:
+                link:
                   config.link.type === "unlimited"
                     ? "unlimited"
                     : "" + config.link.amt,
