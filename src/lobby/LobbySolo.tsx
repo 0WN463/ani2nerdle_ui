@@ -1,17 +1,21 @@
 import { useNavigate, createSearchParams } from "react-router-dom";
 import { useState } from "react";
 
-type LinkLimit = { type: "unlimited" } | { type: "limited"; amt: number };
+type Limit = { type: "unlimited" } | { type: "limited"; amt: number };
 
-const LinkLimitOption = ({
+const LimitOption = ({
   limit,
   onLimitChange,
+  label,
+  defaultValue,
 }: {
-  limit: LinkLimit;
-  onLimitChange: (_: LinkLimit) => void;
+  limit: Limit;
+  onLimitChange: (_: Limit) => void;
+  label: string;
+  defaultValue: number;
 }) => (
   <label>
-    Link Limit:
+    {label}
     <div className="flex gap-2">
       <label>
         Unlimited
@@ -22,14 +26,14 @@ const LinkLimitOption = ({
             onLimitChange(
               limit.type === "limited"
                 ? { type: "unlimited" }
-                : { type: "limited", amt: 3 },
+                : { type: "limited", amt: defaultValue },
             )
           }
         />
       </label>
       <input
         type="number"
-        className="border border-gray-500 rounded"
+        className="border border-gray-500 rounded w-10"
         value={limit.type === "limited" ? limit.amt : ""}
         disabled={limit.type !== "limited"}
         min={1}
@@ -41,6 +45,16 @@ const LinkLimitOption = ({
   </label>
 );
 
+type Config = {
+  link: Limit;
+  cast: Limit;
+};
+
+const defaultConfig = {
+  link: { type: "limited", amt: 3 },
+  cast: { type: "limited", amt: 1 },
+} as const;
+
 const Lobby = () => {
   /* TODO: Add:
    * handicap
@@ -48,12 +62,12 @@ const Lobby = () => {
    * player indicators
    * */
 
-  const [limit, setLimit] = useState<LinkLimit>({ type: "limited", amt: 3 });
+  const [config, setConfig] = useState<Config>(defaultConfig);
   const navigate = useNavigate();
 
   return (
     <div className="relative h-screen">
-      <div className="absolute top-3/4 left-1/2 flex flex-col gap-10 -translate-y-1/2 -translate-x-1/2">
+      <div className="absolute top-3/4 left-1/2 flex flex-col gap-4 -translate-y-1/2 -translate-x-1/2">
         <button
           className="text-3xl bg-sky-300 rounded mx-3 p-3"
           onClick={() =>
@@ -61,14 +75,31 @@ const Lobby = () => {
               pathname: "/solo/game",
               search: createSearchParams({
                 limit:
-                  limit.type === "unlimited" ? "unlimited" : "" + limit.amt,
+                  config.link.type === "unlimited"
+                    ? "unlimited"
+                    : "" + config.link.amt,
+                cast:
+                  config.cast.type === "unlimited"
+                    ? "unlimited"
+                    : "" + config.cast.amt,
               }).toString(),
             })
           }
         >
           Start
         </button>
-        <LinkLimitOption limit={limit} onLimitChange={setLimit} />
+        <LimitOption
+          limit={config.link}
+          onLimitChange={(v) => setConfig({ ...config, link: v })}
+          label="Link Limit:"
+          defaultValue={defaultConfig.link.amt}
+        />
+        <LimitOption
+          limit={config.cast}
+          onLimitChange={(v) => setConfig({ ...config, cast: v })}
+          label="Cast Limit:"
+          defaultValue={defaultConfig.cast.amt}
+        />
       </div>
     </div>
   );
