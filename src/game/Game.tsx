@@ -7,6 +7,8 @@ import Lobby from "../lobby/Lobby";
 import Stack from "./Stack";
 import toast, { Toaster } from "react-hot-toast";
 import SearchBar from "./SearchBar";
+import PanelBar from "./PanelBar";
+import { GameState, Linkage } from "./types";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };
 
@@ -59,6 +61,10 @@ const Game = ({ id: firstAnime }: { id: number }) => {
       />
       <Stack data={data} linkLimit={Infinity} />
       <Toaster />
+      <PanelBar
+        className="fixed bottom-4 left-3/4"
+        data={{ linkages, state }}
+      />
     </>
   );
 };
@@ -138,21 +144,12 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
       />
       <Stack data={data} linkLimit={linkLimit} />
       <Toaster />
+      <PanelBar
+        className="fixed bottom-4 left-3/4"
+        data={{ linkages, state }}
+      />
     </>
   );
-};
-
-type GameState = {
-  animes: number[];
-};
-
-type Linkage = {
-  name: string;
-  id: number;
-  role: string;
-  image_url: string;
-  chara_name: string;
-  chara_img_url?: string;
 };
 
 const useRandomPopularAnime = () => {
