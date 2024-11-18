@@ -29,7 +29,7 @@ const Modal = ({
       onCancel={closeModal}
       className={`rounded-lg p-4 ${className}`}
     >
-      <div className="grid grid-rows-8 grid-cols-1 gap-2">
+      <div className="grid grid-rows-6 grid-cols-1 gap-2">
         {children}
 
         <button className="mx-auto -row-end-1" onClick={closeModal}>
@@ -76,7 +76,7 @@ const Stats = ({ data }: { data: Data }) => {
       <Modal
         openModal={open}
         closeModal={() => setOpen(false)}
-        className="w-1/2"
+        className="w-4/5 lg:w-1/2"
         children={
           <>
             <div className="row-span-2">Number of animes: {numAnimes}</div>
