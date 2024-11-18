@@ -178,22 +178,23 @@ const fetchFn = (animeId?: number) => async () => {
   const res = await response.json();
 
   const charaToLinkage = (data: any) => {
-    const japVa = data.voice_actors.find(
+    const japVas = data.voice_actors.filter(
       (role: any) => role.language === "Japanese",
     );
 
-    if (!japVa) return null;
-
-    return {
+    return japVas.map((japVa: any) => ({
       name: japVa.person.name,
       id: japVa.person.mal_id,
       image_url: japVa.person.images?.jpg?.image_url,
       chara_name: data.character.name,
       chara_img_url: data.character.images.webp.image_url,
-    };
+      role: data.role,
+    }));
   };
 
-  return res?.data?.map(charaToLinkage).filter((l?: Linkage) => l) as Linkage[];
+  return res?.data
+    ?.flatMap(charaToLinkage)
+    .filter((l?: Linkage) => l) as Linkage[];
 };
 
 const useLinkage = (animeId?: number) => {
