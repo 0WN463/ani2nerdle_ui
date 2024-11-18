@@ -13,7 +13,7 @@ export type ConcreteLink = {
   numUsed: number;
 };
 
-const CharacterDetail = ({
+export const CharacterDetail = ({
   name,
   image_url,
   imageAnchor,
@@ -37,7 +37,7 @@ const CharacterDetail = ({
   );
 };
 
-const VoiceActorDetails = ({
+export const VoiceActorDetails = ({
   name,
   image_url,
 }: {
@@ -47,7 +47,7 @@ const VoiceActorDetails = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <div
+    <span
       className="whitespace-nowrap relative"
       onMouseOver={() => setOpen(true)}
       onMouseOut={() => setOpen(false)}
@@ -59,7 +59,7 @@ const VoiceActorDetails = ({
           className={`z-10 max-w-none w-20 absolute mx-2 left-full -translate-y-1/2`}
         />
       )}
-    </div>
+    </span>
   );
 };
 

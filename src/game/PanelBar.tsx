@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, ReactNode } from "react";
 import { GameState, Linkage } from "./types";
-import { ConcreteLink } from "./VoiceActor";
+import { ConcreteLink, CharacterDetail, VoiceActorDetails } from "./VoiceActor";
 
 const Modal = ({
   openModal,
@@ -107,8 +107,13 @@ const ShowCast = ({ linkages }: { linkages: Linkage[] }) => {
         children={
           <>
             {mainLinkages.map((l) => (
-              <div>
-                {l.chara_name}: {l.name}
+              <div className="text-sm flex justify-around">
+                <CharacterDetail
+                  imageAnchor="top"
+                  name={l.chara_name}
+                  image_url={l.chara_img_url ?? ""}
+                />
+                <VoiceActorDetails name={l.name} image_url={l.image_url} />
               </div>
             ))}
           </>
