@@ -62,8 +62,9 @@ const Game = ({ id: firstAnime }: { id: number }) => {
       <Stack data={data} linkLimit={Infinity} />
       <Toaster />
       <PanelBar
-        className="fixed bottom-4 left-3/4"
+        className="fixed bottom-4 right-1/4"
         data={{ linkages, state }}
+        activeLinkage={activeLinkage ?? []}
       />
     </>
   );
@@ -148,8 +149,9 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
       <Stack data={data} linkLimit={config.linkLimit} />
       <Toaster />
       <PanelBar
-        className="fixed bottom-4 left-3/4"
+        className="fixed bottom-4 right-4"
         data={{ linkages, state }}
+        activeLinkage={activeLinkage ?? []}
       />
     </>
   );

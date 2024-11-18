@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, ReactNode } from "react";
-import { GameState } from "./types";
+import { GameState, Linkage } from "./types";
 import { ConcreteLink } from "./VoiceActor";
 
 const Modal = ({
@@ -29,10 +29,10 @@ const Modal = ({
       onCancel={closeModal}
       className={`rounded-lg p-4 ${className}`}
     >
-      <div className="grid grid-rows-6 grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 gap-2">
         {children}
 
-        <button className="mx-auto -row-end-1" onClick={closeModal}>
+        <button className="mx-auto" onClick={closeModal}>
           Close
         </button>
       </div>
@@ -88,9 +88,48 @@ const Stats = ({ data }: { data: Data }) => {
   );
 };
 
-const Panel = ({ className, data }: { className?: string; data: Data }) => (
-  <div className={className}>
+const ShowCast = ({ linkages }: { linkages: Linkage[] }) => {
+  const [open, setOpen] = useState(false);
+  const mainLinkages = linkages.filter((l) => l.role === "Main");
+
+  return (
+    <>
+      <button
+        className="px-2 rounded-full bg-slate-300"
+        onClick={() => setOpen(true)}
+      >
+        Show cast
+      </button>
+      <Modal
+        openModal={open}
+        closeModal={() => setOpen(false)}
+        className="w-4/5 lg:w-1/2"
+        children={
+          <>
+            {mainLinkages.map((l) => (
+              <div>
+                {l.chara_name}: {l.name}
+              </div>
+            ))}
+          </>
+        }
+      />
+    </>
+  );
+};
+
+const Panel = ({
+  className,
+  data,
+  activeLinkage,
+}: {
+  className?: string;
+  data: Data;
+  activeLinkage: Linkage[];
+}) => (
+  <div className={`flex ${className}`}>
     <Stats data={data} />
+    <ShowCast linkages={activeLinkage} />
   </div>
 );
 
