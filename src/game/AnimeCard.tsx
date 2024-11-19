@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 type AnimeDetails = {
@@ -25,12 +26,17 @@ const useAnimeDetails = (id: number) =>
 
 const AnimeCard = ({ id }: { id: number }) => {
   const { isLoading, data: details } = useAnimeDetails(id);
+  const [imageLoading, setImageLoading] = useState(true);
   if (isLoading || !details) return <div>Loading...</div>;
 
   return (
     <figure className="items-center flex flex-col">
-      <img src={details.imageUrl} alt={details?.title} />
-      <figcaption>{details?.title}</figcaption>
+      <img
+        src={details.imageUrl}
+        alt={details?.title}
+        onLoad={() => setImageLoading(false)}
+      />
+      {!imageLoading && <figcaption>{details?.title}</figcaption>}
     </figure>
   );
 };
