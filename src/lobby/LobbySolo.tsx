@@ -48,11 +48,13 @@ const LimitOption = ({
 type Config = {
   link: Limit;
   cast: Limit;
+  time: Limit;
 };
 
 const defaultConfig = {
   link: { type: "limited", amt: 3 },
   cast: { type: "limited", amt: 1 },
+  time: { type: "limited", amt: 30 },
 } as const;
 
 const Lobby = () => {
@@ -82,6 +84,10 @@ const Lobby = () => {
                   config.cast.type === "unlimited"
                     ? "unlimited"
                     : "" + config.cast.amt,
+                time:
+                  config.time.type === "unlimited"
+                    ? "unlimited"
+                    : "" + config.time.amt,
               }).toString(),
             })
           }
@@ -99,6 +105,12 @@ const Lobby = () => {
           onLimitChange={(v) => setConfig({ ...config, cast: v })}
           label="Cast Limit:"
           defaultValue={defaultConfig.cast.amt}
+        />
+        <LimitOption
+          limit={config.time}
+          onLimitChange={(v) => setConfig({ ...config, time: v })}
+          label="Time Limit:"
+          defaultValue={defaultConfig.time.amt}
         />
       </div>
     </div>
