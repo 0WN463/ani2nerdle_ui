@@ -14,12 +14,13 @@ const LimitOption = ({
   label: string;
   defaultValue: number;
 }) => (
-  <label>
+  <label className="flex gap-2 justify-around">
     {label}
-    <div className="flex gap-2">
+    <span>
       <label>
         Unlimited
         <input
+          className="mx-2"
           type="checkbox"
           checked={limit.type === "unlimited"}
           onChange={() =>
@@ -41,7 +42,7 @@ const LimitOption = ({
           onLimitChange({ type: "limited", amt: parseInt(v.target.value) })
         }
       />
-    </div>
+    </span>
   </label>
 );
 
@@ -68,8 +69,13 @@ const Lobby = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative h-screen">
-      <div className="absolute top-3/4 left-1/2 flex flex-col gap-4 -translate-y-1/2 -translate-x-1/2">
+    <div>
+      <div className="flex flex-col gap-4 mx-10">
+        <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
+          <div className="text-3xl sm:text-6xl font-bold text-center mt-48">
+            ANI2<span className="text-teal-400">NERDLE</span>
+          </div>
+        </header>
         <button
           className="text-3xl bg-sky-300 rounded mx-3 p-3"
           onClick={() =>
