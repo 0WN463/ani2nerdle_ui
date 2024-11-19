@@ -88,17 +88,40 @@ const Stats = ({ data }: { data: Data }) => {
   );
 };
 
-const ShowCast = ({ linkages }: { linkages: Linkage[] }) => {
+const ShowCast = ({
+  linkages,
+  amt,
+  onPowerUsed,
+}: {
+  linkages: Linkage[];
+  amt: number;
+  onPowerUsed: () => void;
+}) => {
   const [open, setOpen] = useState(false);
+  const [used, setUsed] = useState(false);
+
   const mainLinkages = linkages.filter((l) => l.role === "Main");
+
+  const onClick = () => {
+    if (!used) onPowerUsed();
+
+    setOpen(true);
+    setUsed(true);
+  };
 
   return (
     <>
       <button
-        className="px-2 rounded-full bg-slate-300"
-        onClick={() => setOpen(true)}
+        className="px-2 rounded-full bg-emerald-500 disabled:bg-emerald-200 disabled:text-gray-300 relative"
+        onClick={onClick}
+        disabled={amt === 0}
       >
         Show cast
+        {amt > 0 && amt !== Infinity && (
+          <div className="rounded-full absolute right-1 top-4 h-6 w-6 text-center border-2 bg-emerald-100 flex items-center justify-center">
+            {amt}
+          </div>
+        )}
       </button>
       <Modal
         openModal={open}
@@ -123,18 +146,31 @@ const ShowCast = ({ linkages }: { linkages: Linkage[] }) => {
   );
 };
 
+export type PowerAmount = {
+  cast: number;
+};
+
 const Panel = ({
   className,
   data,
   activeLinkage,
+  powerAmt,
+  onPowerUsed,
 }: {
   className?: string;
   data: Data;
   activeLinkage: Linkage[];
+  powerAmt: PowerAmount;
+  onPowerUsed: (type: keyof PowerAmount) => void;
 }) => (
   <div className={`flex ${className}`}>
     <Stats data={data} />
-    <ShowCast linkages={activeLinkage} />
+    <ShowCast
+      key={data.state.animes[0]}
+      linkages={activeLinkage}
+      amt={powerAmt.cast}
+      onPowerUsed={() => onPowerUsed("cast")}
+    />
   </div>
 );
 

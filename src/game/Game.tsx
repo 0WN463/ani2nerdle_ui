@@ -7,7 +7,7 @@ import Lobby from "../lobby/Lobby";
 import Stack from "./Stack";
 import toast, { Toaster } from "react-hot-toast";
 import SearchBar from "./SearchBar";
-import PanelBar from "./PanelBar";
+import PanelBar, { PowerAmount } from "./PanelBar";
 import { GameState, Linkage } from "./types";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };
@@ -93,10 +93,17 @@ const useConfig = () => {
 
 const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
-  const { activeLinkage, addNextAnime, state, linkages, linkUsages } =
-    useGameState(firstAnime);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
   const config = useConfig();
+  const {
+    activeLinkage,
+    addNextAnime,
+    state,
+    linkages,
+    linkUsages,
+    powerAmt,
+    consumePower,
+  } = useGameState(firstAnime);
 
   useEffect(() => {
     if (!candidateLinkages || !selectedAnime) return;
@@ -152,6 +159,8 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
         className="fixed bottom-4 right-4"
         data={{ linkages, state }}
         activeLinkage={activeLinkage ?? []}
+        powerAmt={powerAmt}
+        onPowerUsed={consumePower}
       />
     </>
   );
@@ -223,9 +232,18 @@ const pairMap = <T, U>(arr: T[], func: (_a: T, _b: T) => U) =>
     .map((i) => func(arr[i], arr[i + 1]));
 
 const useGameState = (id: number) => {
+  const config = useConfig();
   const [state, setState] = useState<GameState>({
     animes: [id],
   });
+
+  const [powerAmt, setPowerAmt] = useState<PowerAmount>({
+    cast: config.castLimit,
+  });
+
+  const consumePower = (type: "cast") =>
+    setPowerAmt({ ...powerAmt, [type]: powerAmt[type] - 1 });
+
   const linkages = useLinkages(state.animes);
   const usedLinkages = pairMap(
     linkages.map((l) => l.data ?? []),
@@ -250,6 +268,8 @@ const useGameState = (id: number) => {
     addNextAnime,
     linkages: usedLinkages,
     linkUsages,
+    powerAmt,
+    consumePower,
   };
 };
 
