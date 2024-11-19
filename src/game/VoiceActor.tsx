@@ -82,7 +82,7 @@ export const VoiceActor = ({
   bg-no-repeat
   bg-center
   bg-[length:6em]
-  bg-sky-300
+  bg-sky-200
   ${concreteLink.numUsed > linkLimit && "opacity-60"}
   `}
   >
