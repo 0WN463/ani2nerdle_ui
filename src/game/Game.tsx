@@ -14,8 +14,14 @@ type Stage = { type: "lobby" } | { type: "game"; animeId: number };
 
 const Game = ({ id: firstAnime }: { id: number }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
-  const { activeLinkage, addNextAnime, state, linkages, powerAmt, consumePower } =
-    useGameState(firstAnime);
+  const {
+    activeLinkage,
+    addNextAnime,
+    state,
+    linkages,
+    powerAmt,
+    consumePower,
+  } = useGameState(firstAnime);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
   const [isGameover, setGameOver] = useState(false);
   const config = useConfig();
@@ -76,8 +82,8 @@ const Game = ({ id: firstAnime }: { id: number }) => {
         className="fixed bottom-4 right-1/4"
         data={{ linkages, state }}
         activeLinkage={activeLinkage ?? []}
-	powerAmt={powerAmt}
-	onPowerUsed={consumePower}
+        powerAmt={powerAmt}
+        onPowerUsed={consumePower}
       />
     </>
   );

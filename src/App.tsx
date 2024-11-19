@@ -2,6 +2,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import Game, { GameSolo } from "./game/Game";
 import LobbySolo from "./lobby/LobbySolo";
 import Playground from "./dev/Dev";
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -18,9 +19,11 @@ const queryClient = new QueryClient({
 const URL = import.meta.env.VITE_WEB_SERVICE_URL;
 
 const Home = () => {
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const createRoom = async () => {
+    setLoading(true);
     const rawResponse = await fetch(URL + "/game", {
       method: "POST",
     });
@@ -38,9 +41,13 @@ const Home = () => {
             <span className="text-orange-500">BATTLE</span>
           </div>
         </header>
-        <button className="rounded-full bg-sky-300" onClick={createRoom}>
-          Create Room
-        </button>
+        {!loading ? (
+          <button className="rounded-full bg-sky-300" onClick={createRoom}>
+            Create Room
+          </button>
+        ) : (
+          "Loading... Please be patient, server could take a few minutes to start..."
+        )}
       </div>
     </div>
   );
