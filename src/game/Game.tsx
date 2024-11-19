@@ -17,6 +17,8 @@ const Game = ({ id: firstAnime }: { id: number }) => {
   const { activeLinkage, addNextAnime, state, linkages } =
     useGameState(firstAnime);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
+  const [isGameover, setGameOver] = useState(false);
+  const config = useConfig();
 
   useEffect(() => {
     const onNextAnime = (id: number) => {
@@ -54,10 +56,19 @@ const Game = ({ id: firstAnime }: { id: number }) => {
 
   return (
     <>
+      {config.timeLimit !== Infinity && (
+        <Timer
+          className="flex justify-center"
+          key={state.animes[0]}
+          timeLimit={config.timeLimit}
+          onTimeout={() => setGameOver(true)}
+        />
+      )}
       <SearchBar
         onSelect={setSelectedAnime}
         isDisabled={(id) => state.animes.includes(id)}
         className="mx-4 my-2"
+        disabled={isGameover}
       />
       <Stack data={data} linkLimit={Infinity} />
       <Toaster />
@@ -82,17 +93,55 @@ const applyIf = <T, U>(fn: (_: T) => U, v: T | null) => (v ? fn(v) : null);
 
 const parseParam = (s: string) => (s === "unlimited" ? Infinity : parseInt(s));
 
+const Timer = ({
+  timeLimit,
+  className,
+  onTimeout,
+}: {
+  timeLimit: number;
+  className?: string;
+  onTimeout: () => void;
+}) => {
+  const [time, setTime] = useState(timeLimit * 10);
+
+  const decrementTimer = () => {
+    setTime((t) => t - 1);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(decrementTimer, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (time <= 0) {
+    onTimeout();
+  }
+
+  const content =
+    time > 0
+      ? (time / 10).toLocaleString(undefined, {
+          maximumFractionDigits: 1,
+          minimumFractionDigits: 1,
+        })
+      : "Time's up!";
+
+  return <div className={`font-bold ${className}`}>{content}</div>;
+};
+
 const useConfig = () => {
   const [searchParams] = useSearchParams();
 
   const linkLimit = applyIf(parseParam, searchParams.get("link")) ?? 3;
   const castLimit = applyIf(parseParam, searchParams.get("cast")) ?? 1;
+  const timeLimit = applyIf(parseParam, searchParams.get("time")) ?? 20;
 
-  return { linkLimit, castLimit };
+  return { linkLimit, castLimit, timeLimit };
 };
 
 const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
+  const [isGameover, setGameOver] = useState(false);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
   const config = useConfig();
   const {
@@ -148,10 +197,19 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
 
   return (
     <>
+      {config.timeLimit !== Infinity && (
+        <Timer
+          className="flex justify-center"
+          key={state.animes[0]}
+          timeLimit={config.timeLimit}
+          onTimeout={() => setGameOver(true)}
+        />
+      )}
       <SearchBar
         onSelect={setSelectedAnime}
         isDisabled={(id) => state.animes.includes(id)}
         className="mx-4 my-2"
+        disabled={isGameover}
       />
       <Stack data={data} linkLimit={config.linkLimit} />
       <Toaster />

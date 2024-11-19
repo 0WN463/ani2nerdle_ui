@@ -24,10 +24,12 @@ const SearchBar = ({
   onSelect,
   isDisabled,
   className,
+  disabled,
 }: {
   onSelect: (id: number) => void;
   isDisabled: (id: number) => boolean;
   className: string;
+  disabled: boolean;
 }) => {
   const [searchTerm, setSearchTerm] = useDebounce("", 300);
 
@@ -70,6 +72,7 @@ const SearchBar = ({
         options={options}
         onChange={(e: any) => onSelect(e.value)}
         filterOption={() => true}
+        isDisabled={disabled}
       />
     </div>
   );
