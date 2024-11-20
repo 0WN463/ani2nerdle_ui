@@ -409,18 +409,19 @@ const interleave = <T, U>(a: T[], b: U[]) => {
 const Page = () => {
   const { id } = useParams();
   const [stage, setStage] = useState<Stage>({ type: "lobby" });
+  const playerId = nanoid();
 
   const onGameStart = (animeId: number) => {
     setStage({ type: "game", animeId });
   };
 
-  useEffect(() => {
-    socket.emit("join_game", { game_id: id, player_id: nanoid() });
-  }, [id]);
+  if (!id) {
+    return "Invalid game id";
+  }
 
   const game =
     stage.type === "lobby" ? (
-      <Lobby onGameStarted={onGameStart} />
+      <Lobby id={id} onGameStarted={onGameStart} playerId={playerId} />
     ) : (
       <>
         <Game id={stage.animeId} />
