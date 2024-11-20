@@ -19,6 +19,7 @@ const Lobby = ({
    * */
 
   const [status, setStatus] = useState<LobbyStatus>("unconnected");
+  const [opponent, setOpponent] = useState<string>();
 
   useEffect(() => {
     socket.connect();
@@ -28,7 +29,7 @@ const Lobby = ({
     socket.emit(
       "join_game",
       { game_id: id, player_id: playerId },
-      (msg: string) => {
+      (msg: string, hostId: string) => {
         if (msg === "ok_new") {
           setStatus("host");
           return;
@@ -36,6 +37,7 @@ const Lobby = ({
 
         if (msg === "ok_paired") {
           setStatus("guest");
+          setOpponent(hostId);
           return;
         }
 
@@ -44,8 +46,8 @@ const Lobby = ({
     );
   }, [id]);
 
-  const onPlayerJoined = (data: any) => {
-    console.log(data);
+  const onPlayerJoined = (playerId: string) => {
+    setOpponent(playerId);
   };
 
   useEffect(() => {
@@ -67,16 +69,18 @@ const Lobby = ({
   return (
     <div className="relative h-screen">
       <div className="absolute top-3/4 left-1/2 flex flex-col gap-10 -translate-y-1/2 -translate-x-1/2">
-        {status === "host" && (
+        {status === "host" ? (
           <button
             className="text-3xl bg-sky-300 rounded mx-3 p-3"
             onClick={startGame}
           >
             Start
           </button>
+        ) : (
+          "Waiting for host"
         )}
-        {playerId}
-        <div>{status}</div>
+        <div>My ID: {playerId}</div>
+        <div>Opponent ID: {opponent}</div>
       </div>
     </div>
   );
