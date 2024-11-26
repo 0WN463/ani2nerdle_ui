@@ -36,7 +36,7 @@ const AnimeCard = ({ id }: { id: number }) => {
         alt={details?.title}
         onLoad={() => setImageLoading(false)}
       />
-      {!imageLoading && <figcaption>{details?.title}</figcaption>}
+      {!imageLoading && <figcaption className="text-center">{details?.title}</figcaption>}
     </figure>
   );
 };
