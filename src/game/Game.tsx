@@ -12,7 +12,13 @@ import { GameState, Linkage } from "./types";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number };
 
-const Game = ({ id: firstAnime }: { id: number }) => {
+const Game = ({
+  id: firstAnime,
+  startsFirst,
+}: {
+  id: number;
+  startsFirst: boolean;
+}) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
   const {
     activeLinkage,
@@ -22,6 +28,8 @@ const Game = ({ id: firstAnime }: { id: number }) => {
     powerAmt,
     consumePower,
   } = useGameState(firstAnime);
+
+  const [isActive, setActive] = useState(startsFirst);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
   const [isGameover, setGameOver] = useState(false);
   const config = useConfig();
@@ -29,6 +37,7 @@ const Game = ({ id: firstAnime }: { id: number }) => {
   useEffect(() => {
     const onNextAnime = (id: number) => {
       addNextAnime(id);
+      setActive(!isActive);
     };
 
     socket.on("next anime", onNextAnime);
@@ -74,7 +83,7 @@ const Game = ({ id: firstAnime }: { id: number }) => {
         onSelect={setSelectedAnime}
         isDisabled={(id) => state.animes.includes(id)}
         className="mx-4 my-2"
-        disabled={isGameover}
+        disabled={isGameover || !isActive}
       />
       <Stack data={data} linkLimit={Infinity} />
       <Toaster />
@@ -408,10 +417,12 @@ const interleave = <T, U>(a: T[], b: U[]) => {
 
 const Page = () => {
   const { id } = useParams();
+  const [isHost, setHost] = useState(false);
   const [stage, setStage] = useState<Stage>({ type: "lobby" });
   const playerId = nanoid();
 
-  const onGameStart = (animeId: number) => {
+  const onGameStart = (animeId: number, isHost: boolean) => {
+    setHost(isHost);
     setStage({ type: "game", animeId });
   };
 
@@ -424,7 +435,7 @@ const Page = () => {
       <Lobby id={id} onGameStarted={onGameStart} playerId={playerId} />
     ) : (
       <>
-        <Game id={stage.animeId} />
+        <Game id={stage.animeId} startsFirst={isHost} />
       </>
     );
 
