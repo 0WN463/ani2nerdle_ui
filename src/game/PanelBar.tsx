@@ -93,10 +93,12 @@ const ShowCast = ({
   linkages,
   amt,
   onPowerUsed,
+  enabled,
 }: {
   linkages: Linkage[];
   amt: number;
   onPowerUsed: () => void;
+  enabled: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const [used, setUsed] = useState(false);
@@ -115,7 +117,7 @@ const ShowCast = ({
       <button
         className="px-2 rounded-full bg-emerald-500 disabled:bg-emerald-200 disabled:text-gray-300 relative"
         onClick={onClick}
-        disabled={amt === 0}
+        disabled={amt === 0 || !enabled}
       >
         Show cast
         {amt > 0 && amt !== Infinity && (
@@ -150,9 +152,11 @@ const ShowCast = ({
 const Pass = ({
   amt,
   onPowerUsed,
+  enabled,
 }: {
   amt: number;
   onPowerUsed: () => void;
+  enabled: boolean;
 }) => {
   const onPowerUsedFunc = () => {
     socket.emit("pass");
@@ -163,7 +167,7 @@ const Pass = ({
     <button
       className="px-2 rounded-full bg-emerald-500 disabled:bg-emerald-200 disabled:text-gray-300 relative"
       onClick={onPowerUsedFunc}
-      disabled={amt === 0}
+      disabled={amt === 0 || !enabled}
     >
       Pass
       {amt > 0 && amt !== Infinity && (
@@ -187,6 +191,7 @@ const Panel = ({
   powerAmt,
   onPowerUsed,
   hasPass,
+  powerEnabled,
 }: {
   className?: string;
   data: Data;
@@ -194,6 +199,7 @@ const Panel = ({
   powerAmt: PowerAmount;
   onPowerUsed: (type: keyof PowerAmount) => void;
   hasPass: boolean;
+  powerEnabled: boolean;
 }) => (
   <div className={`flex ${className}`}>
     <Stats data={data} />
@@ -202,9 +208,14 @@ const Panel = ({
       linkages={activeLinkage}
       amt={powerAmt.cast}
       onPowerUsed={() => onPowerUsed("cast")}
+      enabled={powerEnabled}
     />
     {hasPass && (
-      <Pass amt={powerAmt.pass} onPowerUsed={() => onPowerUsed("pass")} />
+      <Pass
+        amt={powerAmt.pass}
+        onPowerUsed={() => onPowerUsed("pass")}
+        enabled={powerEnabled}
+      />
     )}
   </div>
 );

@@ -100,6 +100,7 @@ const Game = ({
         powerAmt={powerAmt}
         onPowerUsed={consumePower}
         hasPass={true}
+        powerEnabled={isActive}
       />
     </>
   );
@@ -244,6 +245,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
         powerAmt={powerAmt}
         onPowerUsed={consumePower}
         hasPass={false}
+        powerEnabled
       />
     </>
   );
