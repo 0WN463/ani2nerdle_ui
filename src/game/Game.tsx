@@ -40,12 +40,18 @@ const Game = ({
       setActive(!isActive);
     };
 
+    const onPass = () => {
+      setActive(!isActive);
+    };
+
     socket.on("next anime", onNextAnime);
+    socket.on("pass", onPass);
 
     return () => {
       socket.off("next anime", onNextAnime);
+      socket.off("pass", onPass);
     };
-  });
+  }, [isActive]);
 
   useEffect(() => {
     if (!candidateLinkages) return;
@@ -74,7 +80,7 @@ const Game = ({
       {config.timeLimit !== Infinity && (
         <Timer
           className="flex justify-center"
-          key={state.animes[0]}
+          key={`${state.animes[0]}-${isActive}`}
           timeLimit={config.timeLimit}
           onTimeout={() => setGameOver(true)}
         />
@@ -93,6 +99,7 @@ const Game = ({
         activeLinkage={activeLinkage ?? []}
         powerAmt={powerAmt}
         onPowerUsed={consumePower}
+        hasPass={true}
       />
     </>
   );
@@ -236,6 +243,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
         activeLinkage={activeLinkage ?? []}
         powerAmt={powerAmt}
         onPowerUsed={consumePower}
+        hasPass={false}
       />
     </>
   );
@@ -314,9 +322,10 @@ const useGameState = (id: number) => {
 
   const [powerAmt, setPowerAmt] = useState<PowerAmount>({
     cast: config.castLimit,
+    pass: 3,
   });
 
-  const consumePower = (type: "cast") =>
+  const consumePower = (type: "cast" | "pass") =>
     setPowerAmt({ ...powerAmt, [type]: powerAmt[type] - 1 });
 
   const linkages = useLinkages(state.animes);

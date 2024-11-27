@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, ReactNode } from "react";
 import { GameState, Linkage } from "./types";
 import { ConcreteLink, CharacterDetail, VoiceActorDetails } from "./VoiceActor";
+import { socket } from "../lib/socket";
 
 const Modal = ({
   openModal,
@@ -146,8 +147,37 @@ const ShowCast = ({
   );
 };
 
+const Pass = ({
+  amt,
+  onPowerUsed,
+}: {
+  amt: number;
+  onPowerUsed: () => void;
+}) => {
+  const onPowerUsedFunc = () => {
+    socket.emit("pass");
+    onPowerUsed();
+  };
+
+  return (
+    <button
+      className="px-2 rounded-full bg-emerald-500 disabled:bg-emerald-200 disabled:text-gray-300 relative"
+      onClick={onPowerUsedFunc}
+      disabled={amt === 0}
+    >
+      Pass
+      {amt > 0 && amt !== Infinity && (
+        <div className="rounded-full absolute right-1 top-4 h-6 w-6 text-center border-2 bg-emerald-100 flex items-center justify-center">
+          {amt}
+        </div>
+      )}
+    </button>
+  );
+};
+
 export type PowerAmount = {
   cast: number;
+  pass: number;
 };
 
 const Panel = ({
@@ -156,12 +186,14 @@ const Panel = ({
   activeLinkage,
   powerAmt,
   onPowerUsed,
+  hasPass,
 }: {
   className?: string;
   data: Data;
   activeLinkage: Linkage[];
   powerAmt: PowerAmount;
   onPowerUsed: (type: keyof PowerAmount) => void;
+  hasPass: boolean;
 }) => (
   <div className={`flex ${className}`}>
     <Stats data={data} />
@@ -171,6 +203,9 @@ const Panel = ({
       amt={powerAmt.cast}
       onPowerUsed={() => onPowerUsed("cast")}
     />
+    {hasPass && (
+      <Pass amt={powerAmt.pass} onPowerUsed={() => onPowerUsed("pass")} />
+    )}
   </div>
 );
 
