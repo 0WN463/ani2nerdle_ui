@@ -201,7 +201,7 @@ const Panel = ({
   hasPass: boolean;
   powerEnabled: boolean;
 }) => (
-  <div className={`flex ${className}`}>
+  <div className={`flex gap-2 ${className}`}>
     <Stats data={data} />
     <ShowCast
       key={data.state.animes[0]}
