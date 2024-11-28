@@ -118,7 +118,7 @@ const Game = ({
       <Stack data={data} linkLimit={Infinity} />
       <Toaster />
       <MultiplayerPanel
-        className="fixed bottom-4 right-1/4"
+        className="fixed bottom-4 right-4"
         data={{ linkages, state }}
         activeLinkage={activeLinkage ?? []}
         powerAmt={powerAmt}
