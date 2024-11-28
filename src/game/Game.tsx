@@ -10,14 +10,16 @@ import SearchBar from "./SearchBar";
 import PanelBar, { PowerAmount } from "./PanelBar";
 import { GameState, Linkage } from "./types";
 
-type Stage = { type: "lobby" } | { type: "game"; animeId: number };
+type Stage = { type: "lobby" } | { type: "game"; animeId: number; ts: number };
 
 const Game = ({
   id: firstAnime,
   startsFirst,
+  initialTs,
 }: {
   id: number;
   startsFirst: boolean;
+  initialTs: number;
 }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
   const {
@@ -29,18 +31,21 @@ const Game = ({
     consumePower,
   } = useGameState(firstAnime);
 
+  const [timerTs, setTimerTs] = useState(initialTs);
   const [isActive, setActive] = useState(startsFirst);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
   const [isGameover, setGameOver] = useState(false);
   const config = useConfig();
 
   useEffect(() => {
-    const onNextAnime = (id: number) => {
+    const onNextAnime = (id: number, ts: number) => {
       addNextAnime(id);
+      setTimerTs(ts);
       setActive(!isActive);
     };
 
-    const onPass = () => {
+    const onPass = (ts: number) => {
+      setTimerTs(ts);
       setActive(!isActive);
     };
 
@@ -78,11 +83,12 @@ const Game = ({
   return (
     <>
       {config.timeLimit !== Infinity && (
-        <Timer
+        <TimestampedTimer
           className="flex justify-center"
           key={`${state.animes[0]}-${isActive}`}
           timeLimit={config.timeLimit}
           onTimeout={() => setGameOver(true)}
+          ts={timerTs}
         />
       )}
       <SearchBar
@@ -117,6 +123,48 @@ export { GameSoloWrapper as GameSolo };
 const applyIf = <T, U>(fn: (_: T) => U, v: T | null) => (v ? fn(v) : null);
 
 const parseParam = (s: string) => (s === "unlimited" ? Infinity : parseInt(s));
+
+const TimestampedTimer = ({
+  timeLimit,
+  className,
+  onTimeout,
+  ts,
+}: {
+  timeLimit: number;
+  className?: string;
+  onTimeout: () => void;
+  ts: number;
+}) => {
+  const [time, setTime] = useState(Date.now());
+
+  const timeElapsed = time - ts * 1000;
+
+  const timeLeft = timeLimit * 1000 - timeElapsed;
+
+  const syncTimer = () => {
+    setTime(Date.now());
+  };
+
+  useEffect(() => {
+    const interval = setInterval(syncTimer, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (timeLeft <= 0) {
+    onTimeout();
+  }
+
+  const content =
+    timeLeft > 0
+      ? (timeLeft / 1000).toLocaleString(undefined, {
+          maximumFractionDigits: 1,
+          minimumFractionDigits: 1,
+        })
+      : "Time's up!";
+
+  return <div className={`font-bold ${className}`}>{content}</div>;
+};
 
 const Timer = ({
   timeLimit,
@@ -432,9 +480,9 @@ const Page = () => {
   const [stage, setStage] = useState<Stage>({ type: "lobby" });
   const playerId = nanoid();
 
-  const onGameStart = (animeId: number, isHost: boolean) => {
+  const onGameStart = (animeId: number, isHost: boolean, ts: number) => {
     setHost(isHost);
-    setStage({ type: "game", animeId });
+    setStage({ type: "game", animeId, ts });
   };
 
   if (!id) {
@@ -446,7 +494,7 @@ const Page = () => {
       <Lobby id={id} onGameStarted={onGameStart} playerId={playerId} />
     ) : (
       <>
-        <Game id={stage.animeId} startsFirst={isHost} />
+        <Game id={stage.animeId} startsFirst={isHost} initialTs={stage.ts} />
       </>
     );
 

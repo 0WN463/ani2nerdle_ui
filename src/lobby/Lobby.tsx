@@ -8,7 +8,7 @@ const Lobby = ({
   playerId,
   id,
 }: {
-  onGameStarted: (animeId: number, isHost: boolean) => void;
+  onGameStarted: (animeId: number, isHost: boolean, ts: number) => void;
   playerId: string;
   id: string;
 }) => {
@@ -51,8 +51,9 @@ const Lobby = ({
   };
 
   useEffect(() => {
-    const onGameStartedFunc = (animeId: number) =>
-      onGameStarted(animeId, status === "host");
+    const onGameStartedFunc = (animeId: number, ts: number) => {
+      onGameStarted(animeId, status === "host", ts);
+    };
 
     socket.on("start game", onGameStartedFunc);
     socket.on("player joined", onPlayerJoined);
