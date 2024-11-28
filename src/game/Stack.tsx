@@ -50,9 +50,13 @@ const Stack = ({
     <div className="flex flex-col items-center gap-6">
       {data.map((e, i) =>
         e.type === "anime" ? (
-          <AnimeCard key={e.id} id={e.id} />
+          <AnimeCard key={`anime-${e.id}`} id={e.id} />
         ) : (
-          <VoiceActors links={result[(i - 1) / 2]} linkLimit={linkLimit} />
+          <VoiceActors
+            key={`va-${(data[i - 1] as Anime).id}`}
+            links={result[(i - 1) / 2]}
+            linkLimit={linkLimit}
+          />
         ),
       )}
     </div>

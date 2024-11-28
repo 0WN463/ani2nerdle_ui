@@ -88,7 +88,7 @@ export const VoiceActor = ({
   >
     <div>
       {concreteLink.link.to.map((c) => (
-        <CharacterDetail {...{ imageAnchor: "top", ...c }} />
+        <CharacterDetail key={c.name} {...{ imageAnchor: "top", ...c }} />
       ))}
     </div>
     <VoiceActorDetails
@@ -104,7 +104,7 @@ export const VoiceActor = ({
     )}
     <div>
       {concreteLink.link.from.map((c) => (
-        <CharacterDetail {...{ imageAnchor: "bottom", ...c }} />
+        <CharacterDetail key={c.name} {...{ imageAnchor: "bottom", ...c }} />
       ))}
     </div>
   </div>
@@ -136,7 +136,7 @@ const VoiceActors = ({
   return (
     <div className="flex gap-12 max-w-full overflow-x-auto px-24">
       {sorted.map((l) => (
-        <VoiceActor concreteLink={l} linkLimit={linkLimit} />
+        <VoiceActor key={l.id} concreteLink={l} linkLimit={linkLimit} />
       ))}
     </div>
   );

@@ -119,20 +119,16 @@ const ShowCast = ({
         openModal={open}
         closeModal={() => setOpen(false)}
         className="w-4/5 lg:w-1/2"
-        children={
-          <>
-            {mainLinkages.map((l) => (
-              <div className="text-sm flex justify-around">
-                <CharacterDetail
-                  imageAnchor="top"
-                  name={l.chara_name}
-                  image_url={l.chara_img_url ?? ""}
-                />
-                <VoiceActorDetails name={l.name} image_url={l.image_url} />
-              </div>
-            ))}
-          </>
-        }
+        children={mainLinkages.map((l) => (
+          <div key={l.id} className="text-sm flex justify-around">
+            <CharacterDetail
+              imageAnchor="top"
+              name={l.chara_name}
+              image_url={l.chara_img_url ?? ""}
+            />
+            <VoiceActorDetails name={l.name} image_url={l.image_url} />
+          </div>
+        ))}
       />
     </>
   );
