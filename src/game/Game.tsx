@@ -228,9 +228,11 @@ const useConfig = () => {
 
   const linkLimit = applyIf(parseParam, searchParams.get("link")) ?? 3;
   const castLimit = applyIf(parseParam, searchParams.get("cast")) ?? 1;
-  const timeLimit = applyIf(parseParam, searchParams.get("time")) ?? 20;
+  const timeLimit = applyIf(parseParam, searchParams.get("time")) ?? 30;
+  const extensionLimit =
+    applyIf(parseParam, searchParams.get("extension")) ?? 1;
 
-  return { linkLimit, castLimit, timeLimit };
+  return { linkLimit, castLimit, timeLimit, extensionLimit };
 };
 
 const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
@@ -400,8 +402,8 @@ const useGameState = (id: number) => {
 
   const [powerAmt, setPowerAmt] = useState<PowerAmount>({
     cast: config.castLimit,
-    pass: 3,
-    extend: 3,
+    pass: 1,
+    extend: config.extensionLimit,
   });
 
   const consumePower = (type: "cast" | "pass" | "extend") =>

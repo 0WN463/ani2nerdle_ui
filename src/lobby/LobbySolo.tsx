@@ -50,12 +50,14 @@ type Config = {
   link: Limit;
   cast: Limit;
   time: Limit;
+  extend: Limit;
 };
 
 const defaultConfig = {
   link: { type: "limited", amt: 3 },
   cast: { type: "limited", amt: 1 },
   time: { type: "limited", amt: 30 },
+  extend: { type: "limited", amt: 1 },
 } as const;
 
 const Lobby = () => {
@@ -67,6 +69,9 @@ const Lobby = () => {
 
   const [config, setConfig] = useState<Config>(defaultConfig);
   const navigate = useNavigate();
+
+  const toParam = (l: Limit) =>
+    l.type === "unlimited" ? "unlimited" : "" + l.amt;
 
   return (
     <div>
@@ -82,18 +87,10 @@ const Lobby = () => {
             navigate({
               pathname: "/solo/game",
               search: createSearchParams({
-                link:
-                  config.link.type === "unlimited"
-                    ? "unlimited"
-                    : "" + config.link.amt,
-                cast:
-                  config.cast.type === "unlimited"
-                    ? "unlimited"
-                    : "" + config.cast.amt,
-                time:
-                  config.time.type === "unlimited"
-                    ? "unlimited"
-                    : "" + config.time.amt,
+                link: toParam(config.link),
+                cast: toParam(config.cast),
+                time: toParam(config.time),
+                extend: toParam(config.extend),
               }).toString(),
             })
           }
@@ -117,6 +114,12 @@ const Lobby = () => {
           onLimitChange={(v) => setConfig({ ...config, time: v })}
           label="Time Limit:"
           defaultValue={defaultConfig.time.amt}
+        />
+        <LimitOption
+          limit={config.extend}
+          onLimitChange={(v) => setConfig({ ...config, extend: v })}
+          label="Extensions:"
+          defaultValue={defaultConfig.extend.amt}
         />
       </div>
     </div>
