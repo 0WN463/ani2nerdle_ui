@@ -44,25 +44,37 @@ const Game = ({
       setActive(!isActive);
     };
 
+    socket.on("next anime", onNextAnime);
+
+    return () => {
+      socket.off("next anime", onNextAnime);
+    };
+  }, [isActive, addNextAnime]);
+
+  useEffect(() => {
     const onPass = (ts: number) => {
       setTimerTs(ts);
       setActive(!isActive);
     };
 
+    socket.on("pass", onPass);
+
+    return () => {
+      socket.off("pass", onPass);
+    };
+  }, [isActive]);
+
+  useEffect(() => {
     const onExtend = () => {
       setTimerTs(timerTs + 10);
     };
 
-    socket.on("next anime", onNextAnime);
-    socket.on("pass", onPass);
     socket.on("extend", onExtend);
 
     return () => {
-      socket.off("next anime", onNextAnime);
-      socket.off("pass", onPass);
       socket.off("extend", onExtend);
     };
-  }, [isActive, timerTs]);
+  }, [timerTs]);
 
   useEffect(() => {
     if (!candidateLinkages) return;
