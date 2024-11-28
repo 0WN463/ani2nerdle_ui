@@ -189,9 +189,29 @@ const Pass = ({
   );
 };
 
+const ExtendSolo = ({
+  amt,
+  onPowerUsed,
+  enabled,
+}: {
+  amt: number;
+  onPowerUsed: () => void;
+  enabled: boolean;
+}) => {
+  return (
+    <PowerButton
+      enabled={enabled}
+      amt={amt}
+      onClick={onPowerUsed}
+      text="Extend"
+    />
+  );
+};
+
 export type PowerAmount = {
   cast: number;
   pass: number;
+  extend: number;
 };
 
 const SinglePlayerPanel = ({
@@ -200,14 +220,12 @@ const SinglePlayerPanel = ({
   activeLinkage,
   powerAmt,
   onPowerUsed,
-  powerEnabled,
 }: {
   className?: string;
   data: Data;
   activeLinkage: Linkage[];
   powerAmt: PowerAmount;
   onPowerUsed: (type: keyof PowerAmount) => void;
-  powerEnabled: boolean;
 }) => (
   <div className={`flex gap-2 ${className}`}>
     <Stats data={data} />
@@ -216,7 +234,12 @@ const SinglePlayerPanel = ({
       linkages={activeLinkage}
       amt={powerAmt.cast}
       onPowerUsed={() => onPowerUsed("cast")}
-      enabled={powerEnabled}
+      enabled
+    />
+    <ExtendSolo
+      amt={powerAmt.extend}
+      onPowerUsed={() => onPowerUsed("extend")}
+      enabled
     />
   </div>
 );

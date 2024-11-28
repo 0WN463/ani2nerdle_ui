@@ -168,9 +168,11 @@ const TimestampedTimer = ({
 const Timer = ({
   timeLimit,
   className,
+  bonusTime,
   onTimeout,
 }: {
   timeLimit: number;
+  bonusTime: number;
   className?: string;
   onTimeout: () => void;
 }) => {
@@ -186,13 +188,15 @@ const Timer = ({
     return () => clearInterval(interval);
   }, []);
 
-  if (time <= 0) {
+  const timeLeft = bonusTime * 10 + time;
+
+  if (timeLeft <= 0) {
     onTimeout();
   }
 
   const content =
-    time > 0
-      ? (time / 10).toLocaleString(undefined, {
+    timeLeft > 0
+      ? (timeLeft / 10).toLocaleString(undefined, {
           maximumFractionDigits: 1,
           minimumFractionDigits: 1,
         })
@@ -213,6 +217,7 @@ const useConfig = () => {
 
 const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
   const [selectedAnime, setSelectedAnime] = useState<number>();
+  const [bonusTime, setBonusTime] = useState(0);
   const [isGameover, setGameOver] = useState(false);
   const { data: candidateLinkages } = useLinkage(selectedAnime);
   const config = useConfig();
@@ -241,6 +246,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
     if (validLinkages.length) {
       toast.success("Linked!");
       addNextAnime(selectedAnime);
+      setBonusTime(0);
     } else {
       if (sharedLinks.length === 0) {
         toast.error("No links there");
@@ -267,6 +273,12 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
     linkages.map((e) => ({ type: "links" as const, links: e })),
   );
 
+  const onUsePower = (type: "cast" | "extend" | "pass") => {
+    if (type === "extend") setBonusTime(bonusTime + 10);
+
+    consumePower(type);
+  };
+
   return (
     <>
       {config.timeLimit !== Infinity && (
@@ -275,6 +287,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
           key={state.animes[0]}
           timeLimit={config.timeLimit}
           onTimeout={() => setGameOver(true)}
+          bonusTime={bonusTime}
         />
       )}
       <SearchBar
@@ -290,8 +303,7 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
         data={{ linkages, state }}
         activeLinkage={activeLinkage ?? []}
         powerAmt={powerAmt}
-        onPowerUsed={consumePower}
-        powerEnabled
+        onPowerUsed={onUsePower}
       />
     </>
   );
@@ -371,9 +383,10 @@ const useGameState = (id: number) => {
   const [powerAmt, setPowerAmt] = useState<PowerAmount>({
     cast: config.castLimit,
     pass: 3,
+    extend: 3,
   });
 
-  const consumePower = (type: "cast" | "pass") =>
+  const consumePower = (type: "cast" | "pass" | "extend") =>
     setPowerAmt({ ...powerAmt, [type]: powerAmt[type] - 1 });
 
   const linkages = useLinkages(state.animes);
