@@ -208,6 +208,30 @@ const ExtendSolo = ({
   );
 };
 
+const ExtendMulti = ({
+  amt,
+  onPowerUsed,
+  enabled,
+}: {
+  amt: number;
+  onPowerUsed: () => void;
+  enabled: boolean;
+}) => {
+  const onPowerUsedFunc = () => {
+    socket.emit("extend");
+    onPowerUsed();
+  };
+
+  return (
+    <PowerButton
+      enabled={enabled}
+      amt={amt}
+      onClick={onPowerUsedFunc}
+      text="Extend"
+    />
+  );
+};
+
 export type PowerAmount = {
   cast: number;
   pass: number;
@@ -271,6 +295,11 @@ const MultiplayerPanel = ({
     <Pass
       amt={powerAmt.pass}
       onPowerUsed={() => onPowerUsed("pass")}
+      enabled={powerEnabled}
+    />
+    <ExtendMulti
+      amt={powerAmt.extend}
+      onPowerUsed={() => onPowerUsed("extend")}
       enabled={powerEnabled}
     />
   </div>

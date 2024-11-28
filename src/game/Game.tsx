@@ -49,14 +49,20 @@ const Game = ({
       setActive(!isActive);
     };
 
+    const onExtend = () => {
+      setTimerTs(timerTs + 10);
+    };
+
     socket.on("next anime", onNextAnime);
     socket.on("pass", onPass);
+    socket.on("extend", onExtend);
 
     return () => {
       socket.off("next anime", onNextAnime);
       socket.off("pass", onPass);
+      socket.off("extend", onExtend);
     };
-  }, [isActive]);
+  }, [isActive, timerTs]);
 
   useEffect(() => {
     if (!candidateLinkages) return;
