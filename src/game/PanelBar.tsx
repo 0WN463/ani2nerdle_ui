@@ -114,18 +114,7 @@ const ShowCast = ({
 
   return (
     <>
-      <button
-        className="px-2 rounded-full bg-emerald-500 disabled:bg-emerald-200 disabled:text-gray-300 relative"
-        onClick={onClick}
-        disabled={amt === 0 || !enabled}
-      >
-        Show cast
-        {amt > 0 && amt !== Infinity && (
-          <div className="rounded-full absolute right-1 top-4 h-6 w-6 text-center border-2 bg-emerald-100 flex items-center justify-center">
-            {amt}
-          </div>
-        )}
-      </button>
+      <PowerButton enabled={enabled} amt={amt} onClick={onClick} text="Cast" />
       <Modal
         openModal={open}
         closeModal={() => setOpen(false)}
@@ -149,6 +138,33 @@ const ShowCast = ({
   );
 };
 
+const PowerButton = ({
+  text,
+  amt,
+  onClick,
+  enabled,
+}: {
+  text: string;
+  amt: number;
+  onClick: () => void;
+  enabled: boolean;
+}) => {
+  return (
+    <button
+      className="px-2 rounded-full bg-emerald-500 disabled:bg-emerald-200 disabled:text-gray-300 relative"
+      onClick={onClick}
+      disabled={amt === 0 || !enabled}
+    >
+      {text}
+      {amt > 0 && amt !== Infinity && (
+        <div className="rounded-full absolute right-1 top-4 h-6 w-6 text-center border-2 bg-emerald-100 flex items-center justify-center">
+          {amt}
+        </div>
+      )}
+    </button>
+  );
+};
+
 const Pass = ({
   amt,
   onPowerUsed,
@@ -164,18 +180,12 @@ const Pass = ({
   };
 
   return (
-    <button
-      className="px-2 rounded-full bg-emerald-500 disabled:bg-emerald-200 disabled:text-gray-300 relative"
+    <PowerButton
+      enabled={enabled}
+      amt={amt}
       onClick={onPowerUsedFunc}
-      disabled={amt === 0 || !enabled}
-    >
-      Pass
-      {amt > 0 && amt !== Infinity && (
-        <div className="rounded-full absolute right-1 top-4 h-6 w-6 text-center border-2 bg-emerald-100 flex items-center justify-center">
-          {amt}
-        </div>
-      )}
-    </button>
+      text="Pass"
+    />
   );
 };
 
