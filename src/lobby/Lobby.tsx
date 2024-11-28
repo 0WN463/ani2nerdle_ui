@@ -44,7 +44,7 @@ const Lobby = ({
         setStatus("failed");
       },
     );
-  }, [id]);
+  }, [id, playerId]);
 
   const onPlayerJoined = (playerId: string) => {
     setOpponent(playerId);
