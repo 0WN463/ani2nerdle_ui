@@ -184,13 +184,12 @@ export type PowerAmount = {
   pass: number;
 };
 
-const Panel = ({
+const SinglePlayerPanel = ({
   className,
   data,
   activeLinkage,
   powerAmt,
   onPowerUsed,
-  hasPass,
   powerEnabled,
 }: {
   className?: string;
@@ -198,7 +197,6 @@ const Panel = ({
   activeLinkage: Linkage[];
   powerAmt: PowerAmount;
   onPowerUsed: (type: keyof PowerAmount) => void;
-  hasPass: boolean;
   powerEnabled: boolean;
 }) => (
   <div className={`flex gap-2 ${className}`}>
@@ -210,14 +208,39 @@ const Panel = ({
       onPowerUsed={() => onPowerUsed("cast")}
       enabled={powerEnabled}
     />
-    {hasPass && (
-      <Pass
-        amt={powerAmt.pass}
-        onPowerUsed={() => onPowerUsed("pass")}
-        enabled={powerEnabled}
-      />
-    )}
   </div>
 );
 
-export default Panel;
+const MultiplayerPanel = ({
+  className,
+  data,
+  activeLinkage,
+  powerAmt,
+  onPowerUsed,
+  powerEnabled,
+}: {
+  className?: string;
+  data: Data;
+  activeLinkage: Linkage[];
+  powerAmt: PowerAmount;
+  onPowerUsed: (type: keyof PowerAmount) => void;
+  powerEnabled: boolean;
+}) => (
+  <div className={`flex gap-2 ${className}`}>
+    <Stats data={data} />
+    <ShowCast
+      key={data.state.animes[0]}
+      linkages={activeLinkage}
+      amt={powerAmt.cast}
+      onPowerUsed={() => onPowerUsed("cast")}
+      enabled={powerEnabled}
+    />
+    <Pass
+      amt={powerAmt.pass}
+      onPowerUsed={() => onPowerUsed("pass")}
+      enabled={powerEnabled}
+    />
+  </div>
+);
+
+export { MultiplayerPanel, SinglePlayerPanel };

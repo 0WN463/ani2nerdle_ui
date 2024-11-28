@@ -7,7 +7,7 @@ import Lobby from "../lobby/Lobby";
 import Stack from "./Stack";
 import toast, { Toaster } from "react-hot-toast";
 import SearchBar from "./SearchBar";
-import PanelBar, { PowerAmount } from "./PanelBar";
+import { PowerAmount, MultiplayerPanel, SinglePlayerPanel } from "./PanelBar";
 import { GameState, Linkage } from "./types";
 
 type Stage = { type: "lobby" } | { type: "game"; animeId: number; ts: number };
@@ -99,13 +99,12 @@ const Game = ({
       />
       <Stack data={data} linkLimit={Infinity} />
       <Toaster />
-      <PanelBar
+      <MultiplayerPanel
         className="fixed bottom-4 right-1/4"
         data={{ linkages, state }}
         activeLinkage={activeLinkage ?? []}
         powerAmt={powerAmt}
         onPowerUsed={consumePower}
-        hasPass={true}
         powerEnabled={isActive}
       />
     </>
@@ -286,13 +285,12 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
       />
       <Stack data={data} linkLimit={config.linkLimit} />
       <Toaster />
-      <PanelBar
+      <SinglePlayerPanel
         className="fixed bottom-4 right-4"
         data={{ linkages, state }}
         activeLinkage={activeLinkage ?? []}
         powerAmt={powerAmt}
         onPowerUsed={consumePower}
-        hasPass={false}
         powerEnabled
       />
     </>
