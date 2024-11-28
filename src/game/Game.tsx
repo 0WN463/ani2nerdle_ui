@@ -159,6 +159,10 @@ const TimestampedTimer = ({
   const timeLeft = timeLimit * 1000 - timeElapsed;
 
   const syncTimer = () => {
+    if (timeLeft <= 0) {
+      onTimeout();
+    }
+
     setTime(Date.now());
   };
 
@@ -167,10 +171,6 @@ const TimestampedTimer = ({
 
     return () => clearInterval(interval);
   }, []);
-
-  if (timeLeft <= 0) {
-    onTimeout();
-  }
 
   const content =
     timeLeft > 0
