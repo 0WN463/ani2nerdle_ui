@@ -92,6 +92,14 @@ const Lobby = ({
         )}
         <div>My ID: {playerId}</div>
         <div>Opponent ID: {opponent}</div>
+        <button
+          className="hover:underline text-blue-500"
+          onClick={() => {
+            navigator.clipboard.writeText(location.href);
+          }}
+        >
+          Copy invite link
+        </button>
       </div>
     </div>
   );
