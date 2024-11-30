@@ -348,8 +348,13 @@ const useRandomPopularAnime = () => {
       const response = await fetch(
         "https://api.jikan.moe/v4/top/anime?type=tv&filter=bypopularity",
       );
-      const res = await response.json();
-      const animeIds = res?.data?.map((a: any) => a.mal_id);
+
+      type topAnimeResponse = {
+        data: { mal_id: number }[];
+      };
+
+      const res = (await response.json()) as topAnimeResponse;
+      const animeIds = res.data.map((a) => a.mal_id);
 
       return animeIds[Math.floor(Math.random() * animeIds.length)];
     },
@@ -361,14 +366,32 @@ const fetchFn = (language: string, animeId?: number) => async () => {
   const response = await fetch(
     `https://api.jikan.moe/v4/anime/${animeId}/characters`,
   );
-  const res = await response.json();
+  const res = (await response.json()) as CharactersResponse;
 
-  const charaToLinkage = (data: any) => {
+  type CharactersResponse = {
+    data: {
+      character: {
+        name: string;
+        images: { webp: { image_url: string } };
+      };
+      voice_actors: {
+        person: {
+          name: string;
+          mal_id: number;
+          images: { jpg: { image_url: string } };
+        };
+        language: string;
+      }[];
+      role: "Main" | "Supporting";
+    }[];
+  };
+
+  const charaToLinkage = (data: CharactersResponse["data"][0]) => {
     const japVas = data.voice_actors.filter(
-      (role: any) => role.language === language,
+      (role) => role.language === language,
     );
 
-    return japVas.map((japVa: any) => ({
+    return japVas?.map((japVa) => ({
       name: japVa.person.name,
       id: japVa.person.mal_id,
       image_url: japVa.person.images?.jpg?.image_url,
@@ -378,9 +401,7 @@ const fetchFn = (language: string, animeId?: number) => async () => {
     }));
   };
 
-  return res?.data
-    ?.flatMap(charaToLinkage)
-    .filter((l?: Linkage) => l) as Linkage[];
+  return res.data.flatMap(charaToLinkage).filter((l) => l) as Linkage[];
 };
 
 const useLinkage = (language: string, animeId?: number) => {
