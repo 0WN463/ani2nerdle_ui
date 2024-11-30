@@ -51,6 +51,7 @@ type Config = {
   cast: Limit;
   time: Limit;
   extend: Limit;
+  language: string;
 };
 
 const defaultConfig = {
@@ -58,6 +59,7 @@ const defaultConfig = {
   cast: { type: "limited", amt: 1 },
   time: { type: "limited", amt: 30 },
   extend: { type: "limited", amt: 1 },
+  language: "Japanese",
 } as const;
 
 const Lobby = () => {
@@ -91,6 +93,7 @@ const Lobby = () => {
                 cast: toParam(config.cast),
                 time: toParam(config.time),
                 extend: toParam(config.extend),
+                language: config.language,
               }).toString(),
             })
           }
@@ -121,6 +124,15 @@ const Lobby = () => {
           label="Extensions:"
           defaultValue={defaultConfig.extend.amt}
         />
+        <label className="flex gap-2 justify-around">
+          Voice Actor Language:
+          <select
+            onChange={(e) => setConfig({ ...config, language: e.target.value })}
+          >
+            <option value="Japanese">Japanese</option>
+            <option value="English">English</option>
+          </select>
+        </label>
       </div>
     </div>
   );

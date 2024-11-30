@@ -21,6 +21,8 @@ const Game = ({
   startsFirst: boolean;
   initialTs: number;
 }) => {
+  const config = useConfig();
+
   const [selectedAnime, setSelectedAnime] = useState<number>();
   const {
     activeLinkage,
@@ -33,9 +35,11 @@ const Game = ({
 
   const [timerTs, setTimerTs] = useState(initialTs);
   const [isActive, setActive] = useState(startsFirst);
-  const { data: candidateLinkages } = useLinkage(selectedAnime);
+  const { data: candidateLinkages } = useLinkage(
+    config.language,
+    selectedAnime,
+  );
   const [isGameover, setGameOver] = useState(false);
-  const config = useConfig();
 
   useEffect(() => {
     const onNextAnime = (id: number, ts: number) => {
@@ -232,15 +236,17 @@ const useConfig = () => {
   const extensionLimit =
     applyIf(parseParam, searchParams.get("extension")) ?? 1;
 
-  return { linkLimit, castLimit, timeLimit, extensionLimit };
+  const language = searchParams.get("language") ?? "Japanese";
+
+  return { linkLimit, castLimit, timeLimit, extensionLimit, language };
 };
 
 const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
+  const config = useConfig();
+
   const [selectedAnime, setSelectedAnime] = useState<number>();
   const [bonusTime, setBonusTime] = useState(0);
   const [isGameover, setGameOver] = useState(false);
-  const { data: candidateLinkages } = useLinkage(selectedAnime);
-  const config = useConfig();
   const {
     activeLinkage,
     addNextAnime,
@@ -250,6 +256,11 @@ const GameSolo = ({ firstAnime }: { firstAnime: number }) => {
     powerAmt,
     consumePower,
   } = useGameState(firstAnime);
+
+  const { data: candidateLinkages } = useLinkage(
+    config.language,
+    selectedAnime,
+  );
 
   useEffect(() => {
     if (!candidateLinkages || !selectedAnime) return;
@@ -345,7 +356,7 @@ const useRandomPopularAnime = () => {
   });
 };
 
-const fetchFn = (animeId?: number) => async () => {
+const fetchFn = (language: string, animeId?: number) => async () => {
   const response = await fetch(
     `https://api.jikan.moe/v4/anime/${animeId}/characters`,
   );
@@ -353,7 +364,7 @@ const fetchFn = (animeId?: number) => async () => {
 
   const charaToLinkage = (data: any) => {
     const japVas = data.voice_actors.filter(
-      (role: any) => role.language === "Japanese",
+      (role: any) => role.language === language,
     );
 
     return japVas.map((japVa: any) => ({
@@ -371,20 +382,20 @@ const fetchFn = (animeId?: number) => async () => {
     .filter((l?: Linkage) => l) as Linkage[];
 };
 
-const useLinkage = (animeId?: number) => {
+const useLinkage = (language: string, animeId?: number) => {
   return useQuery({
     enabled: !!animeId,
     queryKey: ["animeLinkages", animeId],
-    queryFn: fetchFn(animeId),
+    queryFn: fetchFn(language, animeId),
   });
 };
 
-const useLinkages = (animeIds: number[]) => {
+const useLinkages = (language: string, animeIds: number[]) => {
   return useQueries({
     queries: animeIds.map((animeId) => ({
       queryKey: ["animeLinkages", animeId],
       enabled: !!animeId,
-      queryFn: fetchFn(animeId),
+      queryFn: fetchFn(language, animeId),
     })),
   });
 };
@@ -396,6 +407,7 @@ const pairMap = <T, U>(arr: T[], func: (_a: T, _b: T) => U) =>
 
 const useGameState = (id: number) => {
   const config = useConfig();
+
   const [state, setState] = useState<GameState>({
     animes: [id],
   });
@@ -409,7 +421,7 @@ const useGameState = (id: number) => {
   const consumePower = (type: "cast" | "pass" | "extend") =>
     setPowerAmt({ ...powerAmt, [type]: powerAmt[type] - 1 });
 
-  const linkages = useLinkages(state.animes);
+  const linkages = useLinkages(config.language, state.animes);
   const usedLinkages = pairMap(
     linkages.map((l) => l.data ?? []),
     computeLinks,
