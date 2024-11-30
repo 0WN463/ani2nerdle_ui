@@ -1,6 +1,7 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Game, { GameSolo } from "./game/Game";
 import LobbySolo from "./lobby/LobbySolo";
+import Main from "./main/Main";
 import Playground from "./dev/Dev";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -65,7 +66,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        <Route path="/" element={<LobbySolo />} />
+        <Route path="/" element={<Main />} />
         <Route path="/multi" element={<Home />} />
         <Route path="/solo" element={<LobbySolo />} />
         <Route path="/solo/game" element={<GameSolo />} />

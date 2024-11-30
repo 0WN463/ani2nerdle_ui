@@ -84,7 +84,7 @@ const Lobby = () => {
           </div>
         </header>
         <button
-          className="text-3xl bg-sky-300 rounded mx-3 p-3"
+          className="text-3xl bg-sky-300 rounded mx-auto px-12 py-3"
           onClick={() =>
             navigate({
               pathname: "/solo/game",
