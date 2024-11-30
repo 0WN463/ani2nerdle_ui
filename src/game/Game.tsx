@@ -162,19 +162,20 @@ const TimestampedTimer = ({
 
   const timeLeft = timeLimit * 1000 - timeElapsed;
 
-  const syncTimer = () => {
-    if (timeLeft <= 0) {
-      onTimeout();
-    }
-
-    setTime(Date.now());
-  };
-
   useEffect(() => {
+    const syncTimer = () => {
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        onTimeout();
+      }
+
+      setTime(Date.now());
+    };
+
     const interval = setInterval(syncTimer, 100);
 
     return () => clearInterval(interval);
-  }, [syncTimer]);
+  }, [timeLeft, onTimeout]);
 
   const content =
     timeLeft > 0
