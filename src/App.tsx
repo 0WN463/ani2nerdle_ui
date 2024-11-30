@@ -3,6 +3,7 @@ import Game, { GameSolo } from "./game/Game";
 import LobbySolo from "./lobby/LobbySolo";
 import Main from "./main/Main";
 import Playground from "./dev/Dev";
+import Support from "./support/Support";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -34,23 +35,26 @@ const Home = () => {
   };
 
   return (
-    <div className="relative h-screen">
-      <div className="absolute top-3/4 left-1/2 flex flex-col gap-10 -translate-y-1/2 -translate-x-1/2">
-        <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
-          <div className="text-6xl font-bold">
-            ANI2<span className="text-teal-400">NERDLE</span>
-            <span className="text-orange-500">BATTLE</span>
-          </div>
-        </header>
-        {!loading ? (
-          <button className="rounded-full bg-sky-300" onClick={createRoom}>
-            Create Room
-          </button>
-        ) : (
-          "Loading... Please be patient, server could take a few minutes to start..."
-        )}
+    <>
+      <div className="relative h-screen">
+        <div className="absolute top-3/4 left-1/2 flex flex-col gap-10 -translate-y-1/2 -translate-x-1/2">
+          <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
+            <div className="text-6xl font-bold">
+              ANI2<span className="text-teal-400">NERDLE</span>
+              <span className="text-orange-500">BATTLE</span>
+            </div>
+          </header>
+          {!loading ? (
+            <button className="rounded-full bg-sky-300" onClick={createRoom}>
+              Create Room
+            </button>
+          ) : (
+            "Loading... Please be patient, server could take a few minutes to start..."
+          )}
+        </div>
       </div>
-    </div>
+      <Support />
+    </>
   );
 };
 

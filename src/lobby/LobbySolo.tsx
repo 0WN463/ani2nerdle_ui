@@ -1,5 +1,6 @@
 import { useNavigate, createSearchParams } from "react-router-dom";
 import { useState } from "react";
+import Support from "../support/Support";
 
 type Limit = { type: "unlimited" } | { type: "limited"; amt: number };
 
@@ -76,65 +77,70 @@ const Lobby = () => {
     l.type === "unlimited" ? "unlimited" : "" + l.amt;
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 mx-10">
-        <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
-          <div className="text-3xl sm:text-6xl font-bold text-center mt-48">
-            ANI2<span className="text-teal-400">NERDLE</span>
-          </div>
-        </header>
-        <button
-          className="text-3xl bg-sky-300 rounded mx-auto px-12 py-3"
-          onClick={() =>
-            navigate({
-              pathname: "/solo/game",
-              search: createSearchParams({
-                link: toParam(config.link),
-                cast: toParam(config.cast),
-                time: toParam(config.time),
-                extend: toParam(config.extend),
-                language: config.language,
-              }).toString(),
-            })
-          }
-        >
-          Start
-        </button>
-        <LimitOption
-          limit={config.link}
-          onLimitChange={(v) => setConfig({ ...config, link: v })}
-          label="Link Limit:"
-          defaultValue={defaultConfig.link.amt}
-        />
-        <LimitOption
-          limit={config.cast}
-          onLimitChange={(v) => setConfig({ ...config, cast: v })}
-          label="Cast Limit:"
-          defaultValue={defaultConfig.cast.amt}
-        />
-        <LimitOption
-          limit={config.time}
-          onLimitChange={(v) => setConfig({ ...config, time: v })}
-          label="Time Limit:"
-          defaultValue={defaultConfig.time.amt}
-        />
-        <LimitOption
-          limit={config.extend}
-          onLimitChange={(v) => setConfig({ ...config, extend: v })}
-          label="Extensions:"
-          defaultValue={defaultConfig.extend.amt}
-        />
-        <label className="flex gap-2 justify-around">
-          Voice Actor Language:
-          <select
-            onChange={(e) => setConfig({ ...config, language: e.target.value })}
+    <>
+      <div>
+        <div className="flex flex-col gap-4 mx-10">
+          <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
+            <div className="text-3xl sm:text-6xl font-bold text-center mt-48">
+              ANI2<span className="text-teal-400">NERDLE</span>
+            </div>
+          </header>
+          <button
+            className="text-3xl bg-sky-300 rounded mx-auto px-12 py-3"
+            onClick={() =>
+              navigate({
+                pathname: "/solo/game",
+                search: createSearchParams({
+                  link: toParam(config.link),
+                  cast: toParam(config.cast),
+                  time: toParam(config.time),
+                  extend: toParam(config.extend),
+                  language: config.language,
+                }).toString(),
+              })
+            }
           >
-            <option value="Japanese">Japanese</option>
-            <option value="English">English</option>
-          </select>
-        </label>
+            Start
+          </button>
+          <LimitOption
+            limit={config.link}
+            onLimitChange={(v) => setConfig({ ...config, link: v })}
+            label="Link Limit:"
+            defaultValue={defaultConfig.link.amt}
+          />
+          <LimitOption
+            limit={config.cast}
+            onLimitChange={(v) => setConfig({ ...config, cast: v })}
+            label="Cast Limit:"
+            defaultValue={defaultConfig.cast.amt}
+          />
+          <LimitOption
+            limit={config.time}
+            onLimitChange={(v) => setConfig({ ...config, time: v })}
+            label="Time Limit:"
+            defaultValue={defaultConfig.time.amt}
+          />
+          <LimitOption
+            limit={config.extend}
+            onLimitChange={(v) => setConfig({ ...config, extend: v })}
+            label="Extensions:"
+            defaultValue={defaultConfig.extend.amt}
+          />
+          <label className="flex gap-2 justify-around">
+            Voice Actor Language:
+            <select
+              onChange={(e) =>
+                setConfig({ ...config, language: e.target.value })
+              }
+            >
+              <option value="Japanese">Japanese</option>
+              <option value="English">English</option>
+            </select>
+          </label>
+        </div>
       </div>
-    </div>
+      <Support />
+    </>
   );
 };
 
