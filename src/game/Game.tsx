@@ -174,7 +174,7 @@ const TimestampedTimer = ({
     const interval = setInterval(syncTimer, 100);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [syncTimer]);
 
   const content =
     timeLeft > 0
