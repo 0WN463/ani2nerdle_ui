@@ -36,16 +36,19 @@ const Home = () => {
 
   return (
     <>
-      <div className="relative h-screen">
-        <div className="absolute top-3/4 left-1/2 flex flex-col gap-10 -translate-y-1/2 -translate-x-1/2">
+      <div className="">
+        <div className="flex flex-col gap-2">
           <header style={{ fontFamily: "Font Awesome 6 Sharp Duotone" }}>
-            <div className="text-6xl font-bold">
+            <div className="text-3xl sm:text-6xl font-bold mt-48 text-center">
               ANI2<span className="text-teal-400">NERDLE</span>
               <span className="text-orange-500">BATTLE</span>
             </div>
           </header>
           {!loading ? (
-            <button className="rounded-full bg-sky-300" onClick={createRoom}>
+            <button
+              className="text-xl bg-sky-300 rounded mx-auto px-2 py-3"
+              onClick={createRoom}
+            >
               Create Room
             </button>
           ) : (
