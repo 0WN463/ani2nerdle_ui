@@ -50,6 +50,10 @@ const Lobby = ({
     setOpponent(playerId);
   };
 
+  const onPlayerLeave = () => {
+    setOpponent(undefined);
+  };
+
   useEffect(() => {
     const onGameStartedFunc = (animeId: number, ts: number) => {
       onGameStarted(animeId, status === "host", ts);
@@ -57,10 +61,12 @@ const Lobby = ({
 
     socket.on("start game", onGameStartedFunc);
     socket.on("player joined", onPlayerJoined);
+    socket.on("player disconnected", onPlayerLeave);
 
     return () => {
       socket.off("start game", onGameStartedFunc);
       socket.off("player joined", onPlayerJoined);
+      socket.off("player disconnected", onPlayerLeave);
     };
   }, [onGameStarted, status]);
 
