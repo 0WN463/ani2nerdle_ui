@@ -3,7 +3,7 @@ import { GameState, Linkage } from "./types";
 import { ConcreteLink, CharacterDetail, VoiceActorDetails } from "./VoiceActor";
 import { socket } from "../lib/socket";
 
-const Modal = ({
+export const Modal = ({
   openModal,
   closeModal,
   children,

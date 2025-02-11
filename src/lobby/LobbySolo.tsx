@@ -1,5 +1,6 @@
 import { useNavigate, createSearchParams } from "react-router-dom";
 import { useState } from "react";
+import { Modal } from "../game/PanelBar";
 import Support from "../support/Support";
 
 type Limit = { type: "unlimited" } | { type: "limited"; amt: number };
@@ -71,6 +72,7 @@ const Lobby = () => {
    * */
 
   const [config, setConfig] = useState<Config>(defaultConfig);
+  const [rulesOpen, setRulesOpen] = useState(false);
   const navigate = useNavigate();
 
   const toParam = (l: Limit) =>
@@ -102,6 +104,35 @@ const Lobby = () => {
           >
             Start
           </button>
+
+          <button
+            className="text-xl underline decoration-dotted px-12 py-3"
+            onClick={() => setRulesOpen(true)}
+          >
+            Rules
+          </button>
+          <Modal
+            openModal={rulesOpen}
+            closeModal={() => setRulesOpen(false)}
+            className="w-4/5 lg:w-1/2"
+            children={
+              <ol>
+                <li>
+                  Goal: Connect as many animes as possible that share a voice
+                  actor, before the time runs out.
+                </li>
+                <li>
+                  Each voice actor can only be used a maximum of 3 (default
+                  setting) times.
+                </li>
+                <li>
+                  There are limited-use hints available, such as showing the
+                  main cast of the current anime and extending the time.
+                </li>
+              </ol>
+            }
+          />
+
           <LimitOption
             limit={config.link}
             onLimitChange={(v) => setConfig({ ...config, link: v })}
